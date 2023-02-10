@@ -1,0 +1,341 @@
+---
+title: "Simple golang TCP chat"
+publishDate: "11 Jul 2022"
+description: "On this occasion, we will set up a chat server where several users can log in with a username and communicate in real-time by sending and receiving messages."
+tags: ["go", "goroutines"]
+---
+
+import { Image } from "@astrojs/image/components";
+
+there are multiple ways to create a real-time chat, where user A can communicate with user B and user C.
+On this occasion, we'll create a server chat where multiple users can enter a user name and send/receive messages in real-time.
+
+For this article you will need to have previous experience with:
+- channels
+- goroutines
+
+> today we'll learn how to create a TCP chat in Golang using channels and goroutines
+
+
+index:
+1. [accept connections (accept incoming connections)](#accept-connections)
+2. [client](#client)
+3. [give it structure](#give-it-structure)
+4. [chat](#chat)
+5. [client](#client)
+6. [listen for connections](#listen-for-connections)
+7. [start new client and book new room](#start-new-client-and-book-new-room)
+8. [setting up user](#setting-up-user)
+9. [receive messages](#receive-messages)
+10. [send messages](#send-messages)
+11. [test #1](#test-#1)
+12. [exit queue channel](#exit-queue-channel)
+13. [exit guide](#exit-guide)
+14. [update handleConnection](#update-handleConnection)
+15. [test #2](#test-#2)
+16. [wrap-up](#wrap-up)
+
+let's get started!
+
+first, we need a way to accept incoming connections.
+
+## accept connections
+```go
+package huevosrevueltos.com/simplechat
+
+func buildServer() {
+	server, err := net.Listen("tcp", ":8080") // localhost:8080
+
+	if err != nil {
+		log.Fatalf("could not start chat: %v", err)
+	}
+
+	for {
+		conn, err := server.Accept()
+		if err != nil {
+			log.Fatal("connection err: %v", err)
+			continue
+		}
+		go handleConnection(conn) // start new goroutine per connection
+	}
+}
+
+```
+
+> with this function we start listening for connections in port 8080.
+In an infinite loop, we keep accepting new connections until the program stops.
+
+## client
+
+```go
+func handleConnection(conn net.Conn) {
+	scanner := bufio.NewScanner(conn)
+
+	for scanner.Scan(){
+		if scanner.Err() != nil{
+			break
+		}
+		fmt.Println(scanner.Text())
+	}
+
+	defer conn.Close()
+
+}
+```
+
+> this simple connection handler will print a message every time a client writes to its console
+
+## give it structure
+the next step it's to give more structure to the chat and start sending and start processing the messages.
+
+### chat
+the chat struct will be in charge of receiving, sending, and booking rooms for clients
+
+```go
+type chat struct {
+	clients      []*client
+	messageQueue chan []byte
+}
+```
+> message queue is a channel that waits for incoming client messages, and then propagates them
+
+### client
+client holds more logic, so let's go by steps
+
+```go
+type client struct {
+	name  string
+	conn  net.Conn
+	in    chan []byte
+	out   chan []byte
+	token chan struct{}
+}
+```
+- **name**: is the username of the client, after the connection is established the server asks the user to put a user name to
+- **conn**: is the connection we start with the server
+- **in**: incoming messages channel
+- **out**: outgoing messages channel
+- **token**: room token that it's held until the connection is finished
+
+## listen for connections
+
+```go
+func (c *chat) buildServer() {
+	server, err := net.Listen("tcp", ":8080") // localhost:8080
+
+	if err != nil {
+		log.Fatalf("could not start chat: %v", err)
+	}
+	go c.serve()
+	for {
+		conn, err := server.Accept()
+		if err != nil {
+			log.Fatalf("connection err: %v", err)
+			continue
+		}
+		go c.handleConnection(conn) // start new goroutine per connection
+	}
+}
+
+```
+
+the structure here didn't change that much, `go c.serve`  creates a new goroutine that will handle the message queue and send the message to all the connected clients.
+
+## start the new client and book a new room
+next, we need to create a new client and the channels where she can send/receive messages
+
+```go
+func (c *chat) handleConnection(conn net.Conn) {
+	in, out := make(chan []byte), make(chan []byte)
+	client := newClient(conn, in, out)
+	c.clients = append(c.clients, client)
+	client.start()
+	go c.bookRoom(client)
+	<-client.token
+	defer conn.Close()
+}
+
+```
+
+the steps that this function follows are
+
+- start the user
+- add the client to the current chat
+- create a new "room" to listen for messages from the client
+
+## setting up user
+```go
+
+func newClient(conn net.Conn, in chan []byte, out chan []byte) *client {
+	return &client{in: in, out: out, conn: conn}
+}
+
+```
+
+here we ask the user for a `username` and start goroutines for incoming and outgoing messages
+
+```go
+func (cl *client) start() {
+	cl.setUpUsername()
+	go cl.receiveMessages()
+	go cl.sendMessages()
+}
+```
+
+## receive messages
+
+here we create a new scanner and go until the connection ends or an error happens
+
+```go
+func (cl *client) receiveMessages() {
+	scanner := bufio.NewScanner(cl.conn)
+	for scanner.Scan() {
+		if scanner.Err() != nil {
+			log.Fatalf("receive messages %v: ", scanner.Err())
+			break
+		}
+		cl.in <- scanner.Bytes()
+	}
+	cl.token <- struct{}{} // end connection
+}
+
+```
+
+> the content of the scanners is redirected to the in-client channel and then it's added to the chat message queue
+
+## send messages
+to send messages to a specific client, we listen to the out channel and write to the connection
+```go
+func (cl *client) sendMessages() {
+	for msg := range cl.out {
+
+		cl.conn.Write(msg)
+	}
+}
+```
+
+## test #1
+let's give it a go and run the server and a couple of clients
+**server**
+```
+go run main. go
+```
+this will start listening to connections on port 8080
+
+**for the clients we'll use [nc](https://ss64.com/osx/nc.html)**
+
+**client A**
+```
+nc localhost 8080
+Enter your username: megumin
+welcome megumin
+
+```
+
+**client B**
+```
+nc localhost 8080
+Enter your username: gopher
+welcome gopher
+```
+
+if we write a message on either client we should see the message in both places
+
+**client A**
+```
+nc localhost 8080
+Enter your username: megumin
+welcome megumin
+gopher says: hello megumin
+```
+
+**client B**
+```
+ nc localhost 8080
+Enter your username: gopher
+welcome gopher
+hello megumin
+gopher says: hello megumin
+```
+
+Cool, we have a working chat in place, the next and final step for this time it's to let the other users know when someone leaves the chat
+
+## exit queue channel
+this will help us close the channels, and the connection and let the other users in the room who left the chat
+
+```go
+type chat struct {
+	clients      map[*client]bool //<- notice the update to clients
+	messageQueue chan []byte
+	exitQueue    chan *client
+}
+```
+the exit queue is a channel that holds clients
+
+## exit guide
+```go
+func (c *chat) exitGuide(client *client) {
+	delete(c.clients, client)
+	close(client.in)
+	close(client.out)
+
+	c.messageQueue <- []byte(fmt.Sprintf("%s left the chat\n", client.name))
+	defer client.conn.Close()
+}
+```
+
+## update handleConnection
+```go
+func (c *chat) handleConnection(conn net.Conn) {
+	in, out := make(chan []byte), make(chan []byte)
+	client := newClient(conn, in, out)
+	c.clients[client] = true
+	client.start()
+	go c.bookRoom(client)
+	<-client.token // wait until the client ends writting
+	c.exitQueue <- client // send client to exit queue
+}
+
+```
+
+## test #2
+last but not least the handle connection waits until the client ends writing to the connection and writes to the exit queue passing the client pointer to the channel
+
+**client A**
+```
+nc localhost 8080
+Enter your username: megumin
+welcome megumin
+trump says: hello megumin
+hi trum
+megumin says: hi trum
+bye
+megumin says: bye
+^C
+
+```
+
+**client B**
+```
+nc localhost 8080
+Enter your username: trump
+welcome trump
+hello megumin
+trump says: hello megumin
+megumin says: hi trum
+megumin says: bye
+megumin left the chat
+```
+
+# wrap-up
+
+the overall parts of the chat are
+
+**handleConnection** // creates new goroutines for incomming connection
+**messagesManager** // sends and receives messages from clients
+**server** // single serve function that waits for channel changes, newuser, disconnect, sendmessages
+**bookRoom**: to format and send messages
+**setUpUsername**: at the beginning of the connection we ask for a user name
+**exitGuide**: closes the *in* / *out* channels of the client, deletes the client to the chat and closes the connection
+
+check the full code [here](https://gist.github.com/smollmegumin/2d5c525ccc0debf9eafd650dc8ba080e)

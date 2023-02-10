@@ -1,0 +1,15 @@
+# docker-compose.yaml example file
+version: "3.7"
+services:
+  kagura:
+    container_name: kagura-dev
+    restart: always
+    ports:
+      - "3005:3005"
+    volumes:
+      - .:/usr/src/app
+    command: sh -c "yarn install && yarn dev"
+    build:
+      context: .
+      target: build
+      dockerfile: Dockerfile
