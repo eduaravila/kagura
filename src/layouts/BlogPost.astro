@@ -1,7 +1,8 @@
 ---
 import BlogHero from "@/components/blog/Hero";
-import Curdis from "@/components/Curdis";
+
 import type { CollectionEntry } from "astro:content";
+import Curdis from "../components/Curdis";
 import BaseLayout from "./Base.astro";
 
 interface Props {
@@ -80,5 +81,5 @@ const { headings } = await post.render();
 			<path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"></path>
 		</svg>
 	</button>
-  <Curdis PAGE_ID={title} PAGE_TITLE={title} PAGE_URL={title}/>
+  <Curdis PAGE_ID={title} PAGE_TITLE={title} PAGE_URL={title} client:only="react" />
 </BaseLayout>
