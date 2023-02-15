@@ -1,4 +1,5 @@
-import { z, defineCollection } from "astro:content";
+import { rssSchema } from "@astrojs/rss";
+import { defineCollection, z } from "astro:content";
 
 function removeDupsAndLowerCase(array: string[]) {
 	if (!array.length) return array;
@@ -17,4 +18,8 @@ const post = defineCollection({
 	}),
 });
 
-export const collections = { post };
+const rss = defineCollection({
+	schema: rssSchema,
+});
+
+export const collections = { post, rss };

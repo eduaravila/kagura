@@ -1,6 +1,6 @@
+import siteMeta from "@/site-config";
 import rss from "@astrojs/rss";
 import { getCollection } from "astro:content";
-import siteMeta from "@/site-config";
 
 export const get = async () => {
 	const posts = await getCollection("post");

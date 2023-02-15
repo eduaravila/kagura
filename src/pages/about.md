@@ -1,11 +1,9 @@
 ---
 import PageLayout from "@/layouts/Base";
-import { Image } from "@astrojs/image/components";
-import aboutImg from "../assets/about-astro.png";
 
 const meta = {
 	title: "About",
-	description: "I'm a starter theme for Astro.build",
+	description: "Eduardo avila about",
 };
 ---
 
@@ -15,13 +13,6 @@ const meta = {
 		<p>
 			Welcome to Eduardo Avila's personal blog, where technology and life intersect! Follow along as he delves into the exciting world of web and mobile development, with the occasional foray into other captivating subjects. Don't be shy, hit him up on Twitter & Github and join the conversation!
 		</p>
-		<div class="flex justify-center">
-			<Image
-				src={aboutImg}
-				alt="A cartoon cactus looking at the 'Astro.build' logo"
-				loading="eager"
-			/>
-		</div>
 		<p>Here are my some of my awesome built in features:</p>
 		<ul class="list-inside list-disc">
 			<li>I'm ultra fast as I'm a static site</li>

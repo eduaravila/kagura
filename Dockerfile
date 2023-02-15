@@ -13,5 +13,4 @@ RUN yarn install
 
 COPY . .
 
-FROM build as start
-CMD [ "yarn", "start" ]
+

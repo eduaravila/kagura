@@ -1,10 +1,10 @@
 const siteMeta = {
-	author: "Chris Williams",
-	title: "Astro Theme Cactus",
-	description: "An opinionated starter theme for Astro",
+	author: "Eduardo Avila",
+	title: "tamagoyaki",
+	description: "Eduardo Avila's personal blog",
 	lang: "en-GB",
 	ogLocale: "en_GB",
-	githubUrl: "https://github.com/chrismwilliams/astro-theme-cactus",
+	githubUrl: "https://github.com/eduaravila",
 	themeColorLight: "#fafafa",
 	themeColorDark: "#1d1f21",
 };
