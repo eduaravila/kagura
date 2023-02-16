@@ -1,56 +1,83 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
   data-v-fde0c5aa=""
-  aria-hidden="true"
-  focusable="false"
-  fill="none"
-  viewBox="0 0 272 480"
+  viewBox="0 0 300 300"
   class="iconLeft"
   version="1.1"
   id="svg267"
+  sodipodi:docname="default.svg"
+  inkscape:export-filename="default.svg"
+  inkscape:export-xdpi="96"
+  inkscape:export-ydpi="96"
+  inkscape:version="1.2.2 (b0a84865, 2022-12-01)"
+  xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+  xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns="http://www.w3.org/2000/svg"
   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+    id="namedview269"
+    pagecolor="#ffffff"
+    bordercolor="#000000"
+    borderopacity="0.25"
+    inkscape:showpageshadow="2"
+    inkscape:pageopacity="0.0"
+    inkscape:pagecheckerboard="0"
+    inkscape:deskcolor="#d1d1d1"
+    showgrid="false"
+    inkscape:zoom="2.1066909"
+    inkscape:cx="51.502572"
+    inkscape:cy="154.98239"
+    inkscape:window-width="1920"
+    inkscape:window-height="1027"
+    inkscape:window-x="1440"
+    inkscape:window-y="25"
+    inkscape:window-maximized="0"
+    inkscape:current-layer="svg267" />
   <!---->
   <defs
     data-v-fde0c5aa=""
     id="defs244">
     <!---->
     <linearGradient
+      inkscape:collect="always"
       xlink:href="#4d00bb78-4805-40c5-b58e-18c385d72537"
       id="linearGradient575"
       gradientTransform="scale(0.75584312,1.3230259)"
       x1="15.878714"
-      y1="6.802588"
-      x2="26.460518"
-      y2="6.802588"
+      y1="6.8025881"
+      x2="26.460517"
+      y2="6.8025881"
       gradientUnits="userSpaceOnUse" />
     <linearGradient
+      inkscape:collect="always"
       xlink:href="#4d00bb78-4805-40c5-b58e-18c385d72537"
       id="linearGradient577"
       gradientTransform="scale(0.84515425,1.183216)"
-      x1="7.0992956"
+      x1="7.0992957"
       y1="1.6903085"
       x2="30.763615"
       y2="1.6903085"
       gradientUnits="userSpaceOnUse" />
     <linearGradient
+      inkscape:collect="always"
       xlink:href="#4d00bb78-4805-40c5-b58e-18c385d72537"
       id="linearGradient579"
       gradientTransform="scale(0.84515425,1.183216)"
-      x1="7.0992956"
+      x1="7.0992957"
       y1="1.6903085"
       x2="30.763615"
       y2="1.6903085"
       gradientUnits="userSpaceOnUse" />
     <linearGradient
+      inkscape:collect="always"
       xlink:href="#4d00bb78-4805-40c5-b58e-18c385d72537"
       id="linearGradient581"
       gradientTransform="scale(0.84515425,1.183216)"
       x1="74.613358"
-      y1="9.6077356"
-      x2="98.277679"
-      y2="9.6077356"
+      y1="9.6077358"
+      x2="98.277677"
+      y2="9.6077358"
       gradientUnits="userSpaceOnUse" />
   </defs>
   <g
@@ -59,7 +86,10 @@
     stroke="none"
     fill="url(#4d00bb78-4805-40c5-b58e-18c385d72537)"
     transform="matrix(10.046788,0,0,10.046788,-584.01629,-104.86718)"
-    style="fill:url(#linearGradient581)">
+    style="fill:url(#linearGradient581)"
+    inkscape:export-filename="logo.svg"
+    inkscape:export-xdpi="96"
+    inkscape:export-ydpi="96">
     <g
       data-name="Layer 2"
       id="g264"
@@ -87,10 +117,10 @@
       data-v-fde0c5aa=""
       gradientTransform="rotate(25)"
       id="4d00bb78-4805-40c5-b58e-18c385d72537"
-      x1="0"
-      y1="0"
-      x2="1"
-      y2="0">
+      x1="0%"
+      y1="0%"
+      x2="100%"
+      y2="0%">
       <stop
         data-v-fde0c5aa=""
         offset="0%"

@@ -2,6 +2,7 @@
 import type { IElement } from "@/data/shared";
 import { getFormattedDate } from "@/utils";
 import type { CollectionEntry } from "astro:content";
+import { getSlugFromId } from "src/utils/post";
 
 interface Props extends IElement {
 	post: CollectionEntry<"post">;
@@ -9,14 +10,19 @@ interface Props extends IElement {
 }
 
 const { post, as: Element = "div", withDesc = false } = Astro.props;
+
 const date = new Date(post.data.publishDate);
 const datetime = date.toISOString();
 const postDate = getFormattedDate(date, { month: "short" });
+
+const { locale } = Astro.params;
+const slug = getSlugFromId(post.id);
+const path = locale ? `${locale}/posts/${slug}` : `/posts/${slug}`;
 ---
 
 <time datetime={datetime} class="min-w-[120px] text-gray-500">{postDate}</time>
 <Element>
-	<a href={`/posts/${post.slug}`} class="cactus-link" rel="prefetch">
+	<a href={path} class="cactus-link" rel="prefetch">
 		{post.data.title}
 	</a>
 </Element>

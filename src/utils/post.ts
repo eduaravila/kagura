@@ -40,3 +40,7 @@ export function getLocaleFromPostId(id: string): string {
 	const locale = fileinfo[1];
 	return Object.hasOwn(supportedLanguages, locale) ? locale : fallbackLanguage;
 }
+
+export function getSlugFromId(id: string): string {
+	return id.split("/")[0];
+}
