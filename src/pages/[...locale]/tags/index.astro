@@ -1,10 +1,28 @@
 ---
 import PageLayout from "@/layouts/Base";
 import { getUniqueTagsWithCount } from "@/utils";
+import type { GetStaticPathsResult } from "astro";
 import { getCollection } from "astro:content";
 
 const allPosts = await getCollection("post");
 const allTags = getUniqueTagsWithCount(allPosts);
+
+export async function getStaticPaths(): Promise<GetStaticPathsResult> {
+  return [
+    {
+      params: {
+        locale: undefined
+      },
+    },
+    {
+      params: {
+        locale: "en"
+      },
+    }
+  ]
+
+}
+
 
 const meta = {
 	title: "All Tags",

@@ -1,9 +1,25 @@
 ---
 import PageLayout from "@/layouts/Base";
+import type { GetStaticPathsResult } from "astro";
+
+export async function getStaticPaths(): Promise<GetStaticPathsResult> {
+  return [
+    {
+      params: {
+        locale: undefined
+      },
+    },
+    {
+      params: {
+        locale: "en"
+      },
+    }
+  ]
+}
 
 const meta = {
 	title: "About",
-	description: "Eduardo avila about",
+	description: "I'm a starter theme for Astro.build",
 };
 ---
 

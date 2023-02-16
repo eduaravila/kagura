@@ -4,6 +4,8 @@ import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import SkipLink from "@/components/SkipLink";
 import type { SiteMeta } from "@/data/siteMeta";
+
+
 import siteConfig from "@/site-config";
 
 interface Props {
@@ -16,7 +18,7 @@ const {
 ---
 
 <html lang={siteConfig.lang}>
-  <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+  <script async defer src={"/cusdis.es.js"}></script>
 	<head>
 		<BaseHead title={title} description={description} ogImage={ogImage} articleDate={articleDate} />
 		<script define:vars={{ siteConfig }}>

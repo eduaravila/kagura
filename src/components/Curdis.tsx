@@ -37,19 +37,18 @@ function ReactCusdis(props: {
 	]);
 
 	return (
-		<>
-			<div
-				id="cusdis_thread"
-				data-host={host}
-				data-page-id={props.attrs.pageId}
-				data-app-id={props.attrs.appId}
-				data-page-title={props.attrs.pageTitle}
-				data-page-url={props.attrs.pageUrl}
-				data-theme={props.attrs.theme}
-				style={props.style}
-				ref={divRef}
-			></div>
-		</>
+		<div
+			id="cusdis_thread"
+			className="mt-14 font-serif"
+			data-host={host}
+			data-page-id={props.attrs.pageId}
+			data-app-id={props.attrs.appId}
+			data-page-title={props.attrs.pageTitle}
+			data-page-url={props.attrs.pageUrl}
+			data-theme={props.attrs.theme}
+			ref={divRef}
+			style={{ fontFamily: "monospace" }}
+		></div>
 	);
 }
 
@@ -82,17 +81,15 @@ export default function ({ PAGE_ID, PAGE_URL, PAGE_TITLE }: Props) {
 	}, [theme, setTheme]);
 
 	return (
-		<div className="mt-14 font-light">
-			<ReactCusdis
-				attrs={{
-					host: "https://cusdis.com",
-					appId: "4da780ff-6c97-43c9-8267-c97634af20c6",
-					pageId: PAGE_ID,
-					pageTitle: PAGE_TITLE,
-					pageUrl: PAGE_URL,
-					theme: theme,
-				}}
-			/>
-		</div>
+		<ReactCusdis
+			attrs={{
+				host: "https://cusdis.com",
+				appId: "4da780ff-6c97-43c9-8267-c97634af20c6",
+				pageId: PAGE_ID,
+				pageTitle: PAGE_TITLE,
+				pageUrl: PAGE_URL,
+				theme: theme,
+			}}
+		/>
 	);
 }

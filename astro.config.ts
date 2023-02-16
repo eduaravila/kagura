@@ -27,7 +27,15 @@ export default defineConfig({
 		image({
 			serviceEntryPoint: "@astrojs/image/sharp",
 		}),
-		sitemap(),
+		sitemap({
+			i18n: {
+				defaultLocale: "en",
+				locales: {
+					en: "en-US",
+					es: "es-ES",
+				},
+			},
+		}),
 		prefetch(),
 		react(),
 	],

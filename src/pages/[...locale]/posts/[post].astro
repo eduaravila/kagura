@@ -1,0 +1,53 @@
+---
+import PostLayout from "@/layouts/BlogPost";
+import type { GetStaticPathsResult } from "astro";
+import type { CollectionEntry } from "astro:content";
+import { getCollection } from "astro:content";
+import { fallbackLanguage } from "i18n";
+import { getLocaleFromPostId,getNonDraftPosts } from "src/utils/post";
+
+
+
+export async function getStaticPaths(): Promise<GetStaticPathsResult> {
+	let allPosts: CollectionEntry<"post">[] = await getCollection("post");
+  allPosts = getNonDraftPosts(allPosts)
+  const allPaths = allPosts.map(({ id,slug, ...post})=>{
+    slug = slug.split("/")[0]
+    return {
+      params: {
+        post: slug,
+        locale: getLocaleFromPostId(id)
+      },
+      props:{
+        post
+      }
+    }
+  })
+
+  const fallbackPaths = allPosts.filter(({id})=>getLocaleFromPostId(id) === fallbackLanguage).map(({id,slug, ...post})=>{
+    return {
+      params: {
+        post: slug,
+        locale: undefined
+      },
+      props:{
+        post
+      }
+    }
+  })
+
+	const params = [...allPaths, ...fallbackPaths]
+	return params;
+}
+
+interface Props {
+	post: CollectionEntry<"post">;
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+---
+
+<PostLayout post={post}>
+	<Content />
+</PostLayout>

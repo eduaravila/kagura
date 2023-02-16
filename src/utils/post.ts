@@ -1,4 +1,5 @@
 import type { CollectionEntry } from "astro:content";
+import { fallbackLanguage, supportedLanguages } from "i18n";
 
 export function sortMDByDate(posts: CollectionEntry<"post">[] = []) {
 	return posts.sort(
@@ -24,4 +25,18 @@ export function getUniqueTagsWithCount(posts: CollectionEntry<"post">[] = []): {
 		});
 		return runningTags;
 	}, {});
+}
+
+export function getNonDraftPosts(posts: CollectionEntry<"post">[] = []) {
+	return posts.filter((post) => !post.data.draft);
+}
+
+export function getLocaleFromPostId(id: string): string {
+	const filename = id.split("/")[1];
+	const fileinfo = filename.split(".");
+	if (fileinfo.length < 3) {
+		return fallbackLanguage;
+	}
+	const locale = fileinfo[1];
+	return Object.hasOwn(supportedLanguages, locale) ? locale : fallbackLanguage;
 }
