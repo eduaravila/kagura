@@ -9,8 +9,11 @@ draft: false
 import CodeBlock from 'src/components/blog/CodeBlock.jsx';
 
 <CodeBlock client:load defaultCode={`
-package huevosrevueltos.com/simplechat
-fmt.Println("hello world")
+package main
+import "fmt"
+func main(){
+  fmt.Println("test")
+}
 `}/>
 
 

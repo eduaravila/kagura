@@ -26,7 +26,9 @@ export default function ({ children, defaultCode }: props) {
 		try {
 			const res = await fetch(import.meta.env.PUBLIC_GOPLAYGROUND_API, options);
 			const data = await res.json();
-			if (data.Evetns !== null) {
+			console.log(data);
+
+			if (data.Events === null || data.Events.length === 0) {
 				setResult(data.Errors);
 			} else {
 				setResult(data.Events[0].Message);
@@ -40,16 +42,19 @@ export default function ({ children, defaultCode }: props) {
 	}, []);
 
 	return (
-		<div>
+		<div className="mb-2">
 			<CodeMirror
 				value={code}
 				extensions={[StreamLanguage.define(go)]}
 				onChange={onChange}
-				height="200px"
 				theme={theme}
 			/>
-			<button onClick={runCode}>Run</button>
-			<div>{result}</div>
+			<button onClick={runCode} className="my-2 rounded bg-blue-300 py-2 px-4 text-white">
+				Run
+			</button>
+			{result && (
+				<div className="border-t-2 border-dotted bg-bgColor py-2 font-mono text-lg">{result}</div>
+			)}
 		</div>
 	);
 }

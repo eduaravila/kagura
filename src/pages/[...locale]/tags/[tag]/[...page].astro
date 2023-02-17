@@ -1,24 +1,46 @@
 ---
-import type { GetStaticPathsOptions, Page } from "astro";
-import type { CollectionEntry } from "astro:content";
-import { getCollection } from "astro:content";
-import PageLayout from "@/layouts/Base";
 import PostPreview from "@/components/blog/PostPreview";
 import Pagination from "@/components/Paginator";
-import { getUniqueTags, sortMDByDate } from "@/utils";
+import PageLayout from "@/layouts/Base";
+import { getUniqueTags,sortMDByDate } from "@/utils";
+import type { GetStaticPathsOptions,Page } from "astro";
+import type { CollectionEntry } from "astro:content";
+import { getCollection } from "astro:content";
+import { fallbackLanguage,supportedLanguages } from "i18n";
+import { getLocaleFromPostId,getNonDraftPosts } from "src/utils/post";
 
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
 	const allPosts = await getCollection("post");
 	const allPostsByDate = sortMDByDate(allPosts);
 	const uniqueTags = getUniqueTags(allPostsByDate);
 
-	return uniqueTags.map((tag) => {
-		const filterPosts = allPostsByDate.filter((post) => post.data.tags?.includes(tag));
-		return paginate(filterPosts, {
-			params: { tag },
-			pageSize: 10,
-		});
+  const postPerLocale = Object.keys(supportedLanguages).map((locale) => {
+		const posts = getNonDraftPosts(allPostsByDate).filter(
+			(p) => getLocaleFromPostId(p.id) === locale
+		);
+    return uniqueTags.map((tag) => {
+      const filterPosts = posts.filter((post) => post.data.tags?.includes(tag));
+      return paginate(filterPosts, {
+        params: { tag, locale},
+        pageSize: 10,
+      });
+    })
+	}).flat();
+
+
+  const fallbackLanguagePost = allPostsByDate.filter(
+		(p) => getLocaleFromPostId(p.id) === fallbackLanguage
+	);
+  const postFallbackWithTag = uniqueTags.map((tag) => {
+    const filterPosts = fallbackLanguagePost.filter((post) => post.data.tags?.includes(tag));
+    return paginate(filterPosts, {
+      params: { tag, locale: undefined },
+      pageSize: 10,
+    });
 	});
+
+  return [...postFallbackWithTag, ...postPerLocale];
+
 }
 
 interface Props {
