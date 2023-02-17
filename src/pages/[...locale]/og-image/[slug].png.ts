@@ -1,10 +1,11 @@
+import siteConfig from "@/site-config";
+import { getFormattedDate } from "@/utils";
+import { Resvg } from "@resvg/resvg-js";
 import type { APIContext, GetStaticPathsResult } from "astro";
 import { getCollection, getEntryBySlug } from "astro:content";
 import satori, { SatoriOptions } from "satori";
 import { html } from "satori-html";
-import { Resvg } from "@resvg/resvg-js";
-import siteConfig from "@/site-config";
-import { getFormattedDate } from "@/utils";
+import { getSlugFromId } from "src/utils/post";
 
 const monoFontReg = await fetch(
 	"https://api.fontsource.org/v1/fonts/roboto-mono/latin-400-normal.ttf"
@@ -81,5 +82,7 @@ export async function get({ params: { slug } }: APIContext) {
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
 	const posts = await getCollection("post");
-	return posts.filter(({ data }) => !data.ogImage).map(({ slug }) => ({ params: { slug } }));
+	return posts
+		.filter(({ data }) => !data.ogImage)
+		.map(({ id }) => ({ params: { slug: getSlugFromId(id) } }));
 }

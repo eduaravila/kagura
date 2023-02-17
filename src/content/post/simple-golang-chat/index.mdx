@@ -6,14 +6,11 @@ tags: ["go", "goroutines"]
 draft: false
 ---
 
-import CodeBlock from 'src/components/blog/CodeBlock.jsx';
+import CodeBlock from '../../../components/blog/CodeBlock.jsx';
 
-<CodeBlock client:load defaultCode={`
-package main
-import "fmt"
-func main(){
-  fmt.Println("test")
-}
+<CodeBlock client:only="react" defaultCode={
+  `package huevosrevueltos.com/simplechat
+  fmt.Println("hello world")
 `}/>
 
 

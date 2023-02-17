@@ -6,11 +6,10 @@ import { useCallback, useState } from "react";
 import useTheme from "src/hooks/useTheme";
 
 interface props {
-	children: React.ReactNode;
 	defaultCode: string;
 }
 
-export default function ({ children, defaultCode }: props) {
+export default function ({ defaultCode }: props) {
 	const [code, setCode] = useState(defaultCode);
 	const theme = useTheme();
 	const [result, setResult] = useState("");
