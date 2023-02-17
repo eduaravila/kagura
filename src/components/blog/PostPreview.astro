@@ -17,12 +17,12 @@ const postDate = getFormattedDate(date, { month: "short" });
 
 const { locale } = Astro.params;
 const slug = getSlugFromId(post.id);
-const path = locale ? `${locale}/posts/${slug}` : `/posts/${slug}`;
+const path = locale ? `/${locale}/posts/${slug}` : `/posts/${slug}`;
 ---
 
 <time datetime={datetime} class="min-w-[120px] text-gray-500">{postDate}</time>
 <Element>
-	<a href={path} class="cactus-link" rel="prefetch">
+	<a href={`${path}`} class="cactus-link" rel="prefetch">
 		{post.data.title}
 	</a>
 </Element>

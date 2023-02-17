@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import useTheme from "src/hooks/useTheme";
 
 interface Props {
 	PAGE_ID: string;
 	PAGE_URL: string;
 	PAGE_TITLE: string;
 }
+
 function ReactCusdis(props: {
 	attrs: {
 		host: string;
@@ -53,32 +55,7 @@ function ReactCusdis(props: {
 }
 
 export default function ({ PAGE_ID, PAGE_URL, PAGE_TITLE }: Props) {
-	function getThemePreference(): string {
-		if (typeof window === "undefined" || typeof localStorage) {
-			return "light";
-		}
-
-		if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
-			return localStorage.getItem("theme") as string;
-		}
-		return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-	}
-
-	const [theme, setTheme] = useState<"light" | "dark" | "auto">(
-		getThemePreference() as "light" | "dark" | "auto"
-	);
-	const handleLocalStorage = () => {
-		window.dispatchEvent(new Event("storage"));
-		setTheme(getThemePreference() as "light" | "dark" | "auto");
-	};
-
-	useEffect(() => {
-		window.addEventListener("storage", handleLocalStorage);
-
-		return () => {
-			window.removeEventListener("storage", handleLocalStorage);
-		};
-	}, [theme, setTheme]);
+	const theme = useTheme();
 
 	return (
 		<ReactCusdis
@@ -88,7 +65,7 @@ export default function ({ PAGE_ID, PAGE_URL, PAGE_TITLE }: Props) {
 				pageId: PAGE_ID,
 				pageTitle: PAGE_TITLE,
 				pageUrl: PAGE_URL,
-				theme: theme,
+				theme,
 			}}
 		/>
 	);

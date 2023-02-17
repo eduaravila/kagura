@@ -10,24 +10,35 @@ import { fallbackLanguage,supportedLanguages } from "i18n";
 import { getLocaleFromPostId,getNonDraftPosts } from "src/utils/post";
 
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
+	const MAX_POSTS = 10;
+	let allPosts = await getCollection("post");
+	allPosts = getNonDraftPosts(allPosts);
 
-  const MAX_POSTS = 10;
-  let allPosts = await getCollection("post");
-  allPosts = getNonDraftPosts(allPosts);
+	const uniqueTags = getUniqueTags(allPosts);
+	const allPostsByDate = sortMDByDate(allPosts);
 
-  const uniqueTags = getUniqueTags(allPosts);
-  const allPostsByDate = sortMDByDate(allPosts);
+	const postPerLocale = Object.keys(supportedLanguages).map((locale) => {
+		const posts = getNonDraftPosts(allPostsByDate).filter(
+			(p) => getLocaleFromPostId(p.id) === locale
+		);
+		return paginate(posts, {
+			props: { uniqueTags },
+			params: {
+				locale,
+			},
+			pageSize: 10,
+		});
+	});
 
-  const postPerLocale = Object.keys(supportedLanguages).map((locale) => {
-    const posts = getNonDraftPosts(allPostsByDate).filter((p) => getLocaleFromPostId(p.id) === locale);
-    return paginate(posts, {props: { uniqueTags },params:{
-      locale,
-    }, pageSize: 10 })
-})
+	const fallbackLanguagePost = allPostsByDate.filter(
+		(p) => getLocaleFromPostId(p.id) === fallbackLanguage
+	);
 
-  const fallbackLanguagePost = allPostsByDate.filter((p)=> getLocaleFromPostId(p.id) === fallbackLanguage)
-
-  const postFallback = paginate(fallbackLanguagePost, {props: { uniqueTags }, params:{ locale: undefined }, pageSize: 10 })
+	const postFallback = paginate(fallbackLanguagePost, {
+		props: { uniqueTags },
+		params: { locale: undefined },
+		pageSize: 10,
+	});
 
 	return [postFallback, ...postPerLocale];
 }
@@ -36,9 +47,7 @@ interface Props {
 	page: Page<CollectionEntry<"post">>;
 	uniqueTags: string[];
 }
-console.log(Astro.props);
 const { page, uniqueTags } = Astro.props;
-
 
 const meta = {
 	title: "Posts",

@@ -8,21 +8,19 @@ const allPosts = await getCollection("post");
 const allTags = getUniqueTagsWithCount(allPosts);
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
-  return [
-    {
-      params: {
-        locale: undefined
-      },
-    },
-    {
-      params: {
-        locale: "en"
-      },
-    }
-  ]
-
+	return [
+		{
+			params: {
+				locale: undefined,
+			},
+		},
+		{
+			params: {
+				locale: "en",
+			},
+		},
+	];
 }
-
 
 const meta = {
 	title: "All Tags",

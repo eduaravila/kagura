@@ -3,18 +3,18 @@ import PageLayout from "@/layouts/Base";
 import type { GetStaticPathsResult } from "astro";
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
-  return [
-    {
-      params: {
-        locale: undefined
-      },
-    },
-    {
-      params: {
-        locale: "en"
-      },
-    }
-  ]
+	return [
+		{
+			params: {
+				locale: undefined,
+			},
+		},
+		{
+			params: {
+				locale: "en",
+			},
+		},
+	];
 }
 
 const meta = {
@@ -27,7 +27,10 @@ const meta = {
 	<div class="space-y-6">
 		<h1 class="title">About</h1>
 		<p>
-			Welcome to Eduardo Avila's personal blog, where technology and life intersect! Follow along as he delves into the exciting world of web and mobile development, with the occasional foray into other captivating subjects. Don't be shy, hit him up on Twitter & Github and join the conversation!
+			Welcome to Eduardo Avila's personal blog, where technology and life intersect! Follow along as
+			he delves into the exciting world of web and mobile development, with the occasional foray
+			into other captivating subjects. Don't be shy, hit him up on Twitter & Github and join the
+			conversation!
 		</p>
 		<p>Here are my some of my awesome built in features:</p>
 		<ul class="list-inside list-disc">
