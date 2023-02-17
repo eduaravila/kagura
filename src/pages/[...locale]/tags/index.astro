@@ -3,22 +3,43 @@ import PageLayout from "@/layouts/Base";
 import { getUniqueTagsWithCount } from "@/utils";
 import type { GetStaticPathsResult } from "astro";
 import { getCollection } from "astro:content";
+import { fallbackLanguage,supportedLanguages } from "i18n";
+import { getLocaleFromPostId } from "src/utils/post";
 
-const allPosts = await getCollection("post");
-const allTags = getUniqueTagsWithCount(allPosts);
+
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
+
+  const allPosts = await getCollection("post");
+
+  const postTagsPerLocale = Object.keys(supportedLanguages).map((locale) => {
+    const posts = allPosts.filter((p) => getLocaleFromPostId(p.id) === locale);
+    const tags = getUniqueTagsWithCount(posts);
+    return {
+      params: {
+        locale,
+      },
+      props:{
+        allTags: tags
+      }
+    }
+  });
+
+  const fallbackLanguagePost = allPosts.filter(
+		(p) => getLocaleFromPostId(p.id) === fallbackLanguage
+	);
+  const fallbackLanguageTags = getUniqueTagsWithCount(fallbackLanguagePost);
+
 	return [
 		{
 			params: {
 				locale: undefined,
 			},
+      props:{
+        allTags: fallbackLanguageTags
+      }
 		},
-		{
-			params: {
-				locale: "en",
-			},
-		},
+		...postTagsPerLocale
 	];
 }
 
@@ -26,6 +47,8 @@ const meta = {
 	title: "All Tags",
 	description: "All Tags from my blogs",
 };
+
+const {allTags} = Astro.props;
 ---
 
 <PageLayout meta={meta}>

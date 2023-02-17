@@ -33,7 +33,7 @@ export default function ({ defaultCode }: props) {
 				setResult(data.Events[0].Message);
 			}
 		} catch (error) {
-			console.log(error);
+			setResult("Error: " + error);
 		}
 	};
 	const onChange = useCallback((value: string) => {

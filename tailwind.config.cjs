@@ -19,6 +19,10 @@ module.exports = {
 	},
 	theme: {
 		extend: {
+			fontSize: {
+				tiny: ".5rem",
+				super_tiny: ".2rem",
+			},
 			colors: {
 				bgColor: "var(--theme-bg)",
 				textColor: "var(--theme-text)",
