@@ -1,0 +1,499 @@
+---
+title: "Simple doorbell that sends messages with telegram bot"
+publishDate: "03 Aug 2022"
+description: "IOT arduino doorbell that sends notifications to a telegram channel"
+tags: ["arduino", "nodemcu", "js", "golang", "iot"]
+draft: false
+---
+
+![Build a simple doorbell - send messages with telegram bot](//images.ctfassets.net/tt922ph7a4na/54YsQjmm8wp9fVZpckfAr9/2e6afabd2c08215747b1759294182948/download.jpeg)
+
+The other day, with a lot of free time and being bored, not wanting to demote on apex by playing tilted.
+
+I looked around and noticed an abandoned electronics set that I bought when I was young full of life and dreams, wanting to create robots, and change the world.
+
+to fill that void of feelings and to catch up to my robotics career (also my doorbell broke a couple of days before).
+I started building a doorbell that sends a you in telegram notifications!
+
+> today we'll build a doorbell that sends messages to telegram through a bot.
+
+Content:
+- [Hardware required](#hardware-required.).
+- [Part - 1 Setup.](#part---1-setup)
+	-  [Get the computer to recognize the microcontroller](#get-the-computer-to-recognize-the-microcontroller).
+	- [Flash Espruino to the nodeMCU module.](#flash-espruino-to-the-nodemcu-module)
+		- [Install nodemcu-flasher](#install-nodemcu-flasher).
+		- [Burn Espruino to the microcontroller](#burn-espruino-to-the-microcontroller).
+- [Part - 2 Schematic](#part---2-schematic).
+	- [Connect the the stuff](#connect-the-stuff).
+		- [Full schematic ](#full-schematic).
+- [Part - 3 Connect microcontroller to API](#part---3-connect-microcontroller-to-api).
+	- [Espruino IDE](#espruino-ide).
+	- [connect to WiFi](#connect-to-wifi).
+	- [make the button work](#make-the-button-work).
+	- [Call the API](#call-the-api).
+- [Part - 4 Telegram bot](#part---4-telegram-bot).
+	- [Create a telegram bot](#create-a-telegram-bot).
+	- [Create a telegram channel](#create-a-telegram-channel).
+	- [Make the make admin of the channel](#make-the-make-admin-of-the-channel).
+-  [Part - 5 back-end](#part---5-back-end)
+	- [Tunnel your localhost](#tunnel-your-localhost).
+- [Conclusion](#conclusion).
+
+:::info
+suggestion
+To follow this tutorial you'll only need to have some prior experience programming with Golang and some JS.
+:::
+# Hardware required.
+* NodeMCU - (ESP8266) - check-it [here](https://www.amazon.com/HiLetgo-Internet-Development-Wireless-Micropython/dp/B010O1G1ES).
+* button.
+* 10k ohm resistor.
+* protoboard.
+
+# Part - 1 Setup.
+First things first, we need to configure our WiFi Module.
+all in all, we need to:
+- Get the computer to recognize the nodeMCU module.
+- Flash Espruino to the nodeMCU module. ^c8384a
+-  Verify that we can connect to our router.
+
+## Get the computer to recognize the microcontroller.
+
+:::warning
+Please check that there is no bare metal (including your desk!) near the board when you plug it in, as it could short it out.
+:::
+
+using and USB cable to connect the nodeMCU to the computer.
+
+*on the terminal run:*
+```
+ls /dev/c***
+```
+
+if the output you get is something like this
+```
+**/dev/console**                    **/dev/cu.usbserial-1230**          **/dev/cu.wlan-debug**
+**/dev/cu.Bluetooth-Incoming-Port** **/dev/cu.wchusbserial1230**
+```
+
+this means the chip is recognized -> **/dev/cu.wchusbserial1230**
+https://github.com/marcelstoer/nodemcu-pyflasher
+
+**if not follow this amazing guide to [install CH340 drivers](https://learn.sparkfun.com/tutorials/how-to-install-ch340-drivers/all)**
+
+## Flash Espruino to the nodeMCU module.
+
+there are multiple ways to flash the Espruino firmware to your microcontroller, in this occasion we'll use NodeMCU PyFlasher.
+
+the steps we are going to follow are:
+- install [nodemcu-flasher](https://github.com/nodemcu/nodemcu-flasher)
+- flash espruino_2v14_esp8266_combined_512 to the microcontroller
+
+### install nodemcu-flasher.
+
+install the [nodemcu-pyflasher](https://github.com/marcelstoer/nodemcu-pyflasher)
+the guide itself is exquisitely made and covers everything you need to know in detail.
+
+---
+If everything went well you should see something like this
+
+![nodemcu](//images.ctfassets.net/tt922ph7a4na/7KidSkudBJ20WnZ48EvR5U/4f7eb669d44829724c63a7262a9ec47e/Screen_Shot_2022-07-30_at_14.35.05.png)
+
+### Burn Espruino to the microcontroller.
+
+Now it's time to install the firmware.
+
+Download [espruino_2v14_esp8266_4mb_combined_4096.bin](https://www.espruino.com/binaries/espruino_2v14_esp8266_4mb_combined_4096.bin)
+
+open nodemcu-pyflasher, in *serial port*, select the port corresponding to the NodeMCU microcontroller.
+on **NodeMCU firmware** select espruino_2v14_esp8266_combined_512.bin
+*baud rate*  -> 115200
+*Flash mode* -> Dual I/O (DIO)
+*Erase flash* -> yes, wipes all data
+and click *Flash NodeMCU*
+
+[![flash node mcu](//images.ctfassets.net/tt922ph7a4na/7KidSkudBJ20WnZ48EvR5U/4f7eb669d44829724c63a7262a9ec47e/Screen_Shot_2022-07-30_at_14.35.05.png)](//videos.ctfassets.net/tt922ph7a4na/5XMop72vzjElhNhQ4xMs44/3964e4fd53bdf2c492592a90b1ef9613/flash_node_mcu.mp4)
+
+if the flash was successful the console prints something like
+
+```
+...
+...spects of microcontroller...
+...
+
+Leaving...
+Staying in bootloader.
+
+Firmware successfully flashed. Unplug/replug or reset the device
+to switch back to normal boot mode.
+
+```
+
+# Part - 2 Schematic.
+
+The focus of this section is to get the connections in place so we can get to the code part.
+*We will divide this part into two sections.*
+
+The first section will focus on connecting the button with the micro-controller, this will be more than enough to accomplish the main goal.
+
+In the following optional section, we are going to add more components to support an AC device let us say a light bulb or an actual speaker to complement the telegram notification.
+
+## Connect the stuff.
+In this part, we are going to connect a button, so the NodeMCU reads LOW when the button is not pressed and HIGH when is pressed.
+
+### Full schematic.
+
+![doorbell-schematic](//images.ctfassets.net/tt922ph7a4na/6GEslMQH9eXqjyIf1d9HO5/bc94c37ed6b11a7c0cc85ae379be6717/Pasted_image_20220730181614.png)
+
+# Part - 3 Connect microcontroller to API.
+
+It's time to write JS code to control the NodeMCU module, for that we are going to use the browser and the Espruino IDE.
+
+:::note Setup
+make sure that your computer detects the module when you connect it. If that's not the case you can find some help here [Part - 1 Setup.](#part---1-setup)
+:::
+
+## Espruino IDE.
+
+in your favorite browser open https://www.espruino.com/ide/#, in this occasion, I will be using Google Chrome.
+Click on the top left connect button -> Web Serial -> \<your_port_number\>
+
+## connect to WiFi.
+
+After a successful connection with the IDE, it's time to write some code.
+To use wifi we are going to use the `wifi` module, all in all, we are going to need, the WiFi `SSID` and `password`.
+the
+
+The purpose of the code it's to disconnect previous connections and start a new one.
+if the connection fails, we print it on the console.
+
+```js
+wifi.disconnect(function(){
+	wifi.connect(SSID, {password:pass,channel:0}, function(e) {
+	  if(e){
+	    print(e);
+	  }
+	});
+});
+```
+
+This is ok we have the driver connected to the computer where we can see the console and debug, but then what if the microcontroller was on its own?
+we need a way to know if the connection went well or not.
+```js
+
+wifi.save("clear");
+var endLoading = notifyLoading(); // start loading
+wifi.disconnect(function(){
+wifi.connect(SSID, {password:pass,channel:0}, function(e) {
+  if(e){
+    endLoading(); // end current loading
+    endLoading = notifyLoading(errorTime); // faster blink indicating that something went wrong.
+    return;
+  }
+  endLoading(); // end loading connection successful.
+});
+});
+
+```
+
+the notifyLoading function toggles the build-in led on and off on a timely interval, `errorTime` is just a faster interval resulting in a faster blink
+
+```js
+var errorTime = 200;
+
+NodeMCU.D4.mode("output");
+function notifyLoading(time){
+  time = time || 1000;
+  var tiToggle = setInterval(function(){
+  NodeMCU.D4.toggle();
+  },time);
+
+  return function(){
+    NodeMCU.D4.write(1);
+    clearInterval(tiToggle);
+  };
+}
+```
+
+so far so good, our microcontroller can connect to WiFi, and also we have a way to know if the connection went cool or not so cool.
+
+- fast blink == BAD 🫠
+- no blink == GOOD 😎
+
+## make the button work.
+1. Now it's time to call the API every time we click the button.
+
+```js
+NodeMCU.D2.mode("input_pulldown");
+setWatch(clickButton,NodeMCU.D2,{repeat:true,debounce:50, edge:"rising"});
+
+var afterClicks = 0;
+function clickButton() {
+    times++;
+    clearTimeout(afterClicks);
+    afterClicks = setTimeout(sendCode,500);
+}
+
+```
+in this case, we are using `D2`  in `input` mode and calling `clickButton`
+
+`clickButton` counts the number of consecutive clicks and calls `sendCode` after a 500ms period, for example.
+
+```
+Click.
+200 ms passed
+Click ..
+100 ms passed
+Click ...
+500 ms passed
+number of clicks 3
+```
+
+the meaning of these consecutive clicks is to let you know how important the door call is, probably the person ringing the bell is in a rush.
+I.e
+
+- 1 - 3 clicks = normal
+- 4- 7 clicks = important
+- 8 - more clicks = urgent
+this could be scaled to let's say recognize [morse code](https://en.wikipedia.org/wiki/Morse_code), think of the possibilities.
+
+2. Before we call the API, we need a way to know if the microcontroller has an internet connection.
+
+```js
+var times = 0;
+var sendCode = function(){
+      isConnectedHOC(function(){
+        clearError();
+        callAlert(times);
+        times=0;
+      });
+};
+
+function isConnectedHOC(f) {
+  wifi.getStatus(function(e){
+    if(e.station ==="connected"){
+      f();
+    }
+  });
+}
+```
+
+In this code you:
+	* check if the connection `station` === "connected"
+		* clear previous errors.
+		* call the API passing `times` and restoring it to 0.
+	* else ignore API call
+
+## Call the API.
+In this section, you'll add a generic function to call A REST API, with the number of times the button was pressed.
+
+```js
+
+var api ="<your_end_point>";
+
+var clearError = notifyLoading;
+function callAlert(times){
+  if (loading) return; // check race condition
+ var res = http.get(api+"?times="+times, function(res) {
+   loading = true;
+    res.on('data', function(data) {
+      print("HTTP> ", data);
+    });
+    res.on('close', function(data) {
+      loading= false;
+      print("Connection closed");
+    });
+     res.on('error', function(data) {
+      loading= false;
+      print("Connection error");
+    });
+  });
+  res.on("error",function(err){
+    clearError  = isError();
+  });
+}
+
+```
+
+Refer to [Tunnel your localhost](#tunnel-your-localhost). to get `api`
+
+In this code you:
+	* check if there is a call to the API going on, if that is the case return
+	* call HTTP.get and update loading = true
+	* wait for a response from the API
+	* if res.on "data" print the response
+	* if res.on "close" or "error" update loading = false
+	* if the response returns an error we call `isError`, to physically see in the microcontroller that something went wrong and should be addressed.
+
+# Part - 4 Telegram bot.
+In this section, you'll
+- create a telegram bot
+- create a telegram channel
+- make the bot admin of the channel
+
+## Create a telegram bot.
+Creating a bot is a quick rewarding task, follow the Telegram guide to [How do I create a bot?](https://core.telegram.org/bots#3-how-do-i-create-a-bot)
+
+After all, that configuration, try sending a `/mybots` to `BotFather` in telegram and you should see your shiny new bot.
+
+![botlist](//images.ctfassets.net/tt922ph7a4na/3cPg26JasEVGW7Fdr17F6G/55ba8037934cf3e468b9571cda1dcbf0/botlist.png)
+
+:::info Key
+
+We'll need the API key for the REST API that we are going to create.
+
+:::
+
+## Create a telegram channel.
+To create a channel:
+_iPhone:_ Start a new message (tap the icon in the top-right corner in Chats). Then ‘New Channel’.
+_Android:_ Tap the circular pencil icon in the chat list. Then ‘New Channel’.
+_Windows Phone:_ Tap the ‘+’ button on the bottom bar. Then ‘New Channel’.
+
+## Make the make admin of the channel.
+
+Tap on the channel you just created -> administrators -> add admin -> search and select your bot.
+
+# Part - 5 back-end.
+In this section, you'll
+- create a simple REST API
+	- configure your telegram bot and chat
+	- send messages to the channel depending on the `times` the doorbell was pressed.
+	- create a custom messages structure to use depending on the number of `times`
+
+```go
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
+	"math/rand"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+)
+
+type regularMessage struct {
+}
+
+type urgentMessage struct {
+}
+
+type emote struct {
+}
+
+type message interface {
+	fmt.Stringer
+	ParseMode() string
+}
+
+// custom messages
+func (e emote) String() string {
+	s := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s)
+	rs := r1.Intn('\U0001F640' - '\U0001F600')
+	return string(rune('\U0001F600' + rs))
+}
+
+func (r regularMessage) String() string {
+	return fmt.Sprintf("Hey! %s", &emote{})
+}
+func (r regularMessage) ParseMode() string {
+	return ""
+}
+
+func (r urgentMessage) ParseMode() string {
+	return "HTML"
+}
+
+func (urgentMessage) String() string {
+	return fmt.Sprintf("<b>%s</b>", strings.ToUpper("atiende la puerta"))
+}
+
+const telegramApi = "https://api.telegram.org/<your_bot_key>"
+
+// select the type of message depending on the number of times
+// the button was pressed
+func getMessageType(times string) message {
+	timesin, _ := strconv.Atoi(times)
+	if timesin <= 3 {
+		return &regularMessage{}
+	}
+
+	return &urgentMessage{}
+
+}
+
+// broadcast message to telegram channel
+func sendAlert(ms message) {
+	b := map[string]any{
+		"chat_id":    "<chat_id>",
+		"text":       ms.String(),
+		"parse_mode": ms.ParseMode(),
+	}
+	body, _ := json.Marshal(b)
+	resp, _ := http.NewRequest(http.MethodPost, telegramApi+"/sendMessage", bytes.NewBuffer(body))
+	resp.Header.Set("content-type", "application/json")
+	http.DefaultClient.Do(resp)
+	respb, _ := io.ReadAll(resp.Body)
+	fmt.Println(string(respb))
+}
+
+// GET /
+func handleIndex(w http.ResponseWriter, r *http.Request) {
+	sendAlert(getMessageType(r.URL.Query().Get("times")))
+	w.WriteHeader(http.StatusOK)
+	defer r.Body.Close()
+}
+
+// start server
+func main() {
+	indexR := http.HandlerFunc(handleIndex)
+	http.Handle("/", indexR)
+	log.Fatal(http.ListenAndServe(":8080", nil))
+
+}
+
+```
+Let's discuss the main parts:
+`sendAlert` is the function in charge of calling the telegram API that broadcast the message
+`getMessageType` sends a message type depending on the number of times the button was pressed, this can be scaled to record times between clicks in a determined range.
+to start the server run `go run main.go`
+
+## Tunnel your localhost.
+
+You'll need to host the API you just created, but if you want to quickly test your code, you can create a tunnel to your local host.
+follow this tutorial from Cloudflare
+Install Cloudflare https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation/
+
+and run `cloudflared tunnel --url http://localhost:8080`
+
+You should get something like this:
+
+```
+2022-08-04T00:37:22Z INF +--------------------------------------------------------------------------------------------+
+2022-08-04T00:37:22Z INF |  Your quick Tunnel has been created! Visit it at (it may take some time to be reachable):  |
+2022-08-04T00:37:22Z INF | *COPY THIS* https://blue-sorts-problem-adrian.trycloudflare.com                                       |
+2022-08-04T00:37:22Z INF +--------------------------------------------------------------------------------------------+
+```
+
+**copy the link and refer back to the Espruino code you previously wrote and replace 'api' with this URL**
+
+check a more complete tutorial about how to create preview tunnels
+https://developers.cloudflare.com/pages/how-to/preview-with-cloudflare-tunnel/
+
+# Conclusion.
+Nicely done! You’ve just created a doorbell that communicates with a go REST API that uses a telegram BOT to send messages! 😎
+
+Suggested new ideas:
+- you could add a "back-up" speaker when there's no internet connection or the API is down and still know when someone is at the door.
+-  Integrate Alexa / echo, add a microphone to your circuit and use it as an intercom.
+
+---
+### full code here
+- [espruino code](https://gist.github.com/smollmegumin/8f729759588c993fddd9f47809ab453c)
+- [API](https://gist.github.com/smollmegumin/dc46254e37e38e6edbd73777fae998a4)

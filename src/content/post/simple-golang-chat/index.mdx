@@ -8,11 +8,6 @@ draft: false
 
 import CodeBlock from '../../../components/blog/CodeBlock.jsx';
 
-<CodeBlock client:only="react" defaultCode={
-  `package huevosrevueltos.com/simplechat
-  fmt.Println("hello world")
-`}/>
-
 
 there are multiple ways to create a real-time chat, where user A can communicate with user B and user C.
 On this occasion, we'll create a server chat where multiple users can enter a user name and send/receive messages in real-time.
@@ -359,15 +354,28 @@ megumin says: bye
 megumin left the chat
 ```
 
-# wrap-up
+<CodeBlock client:only="react" defaultCode={
+  `
+package main
+import (
+	"github.com/eduaravila/simplechat/pkg/chat"
+)
+func main() {
+	chat := chat.NewChat()
+	chat.Start()
+}
+`}/>
 
+
+# TLDR;
 the overall parts of the chat are
 
-**handleConnection** // creates new goroutines for incomming connection
-**messagesManager** // sends and receives messages from clients
-**server** // single serve function that waits for channel changes, newuser, disconnect, sendmessages
-**bookRoom**: to format and send messages
-**setUpUsername**: at the beginning of the connection we ask for a user name
-**exitGuide**: closes the _in_ / _out_ channels of the client, deletes the client to the chat and closes the connection
+- **handleConnection** // creates new goroutines for incomming connection
+- **messagesManager** // sends and receives messages from clients
+- **server** // single serve function that waits for channel changes, newuser, disconnect, sendmessages
+- **bookRoom**: to format and send messages
+- **setUpUsername**: at the beginning of the connection we ask for a user name
+- **exitGuide**: closes the _in_ / _out_ channels of the client, deletes the client to the chat and closes the connection
 
 check the full code [here](https://gist.github.com/smollmegumin/2d5c525ccc0debf9eafd650dc8ba080e)
+package here code [here](github.com/eduaravila/simplechat)

@@ -1,0 +1,76 @@
+---
+title: "Stack with linked list golang"
+publishDate: "03 Apr 2022"
+description: "stack with linked list golang implementation just example"
+tags: ["golang", "data-structure", "stack"]
+draft: false
+---
+
+import CodeBlock  from '../../../components/blog/CodeBlock.tsx'
+
+## stack with linked list
+
+
+<CodeBlock client:only="react" defaultCode={
+`
+package main
+
+import (
+  "container/list"
+  "fmt"
+)
+
+type Stack struct{ list.List }
+
+type StackInterface interface {
+	  Pop() *list.Element
+	  Peek() interface{}
+	  Push(interface{})
+	  IsEmpty() bool
+}
+
+func (S *Stack) Push(val interface{}) {
+	  if val == nil {
+	  	return
+	  }
+	  S.PushFront(val)
+}
+
+func (S *Stack) Pop() *list.Element {
+	  if S.IsEmpty() {
+	  	return nil
+	  }
+	  res := S.Front()
+	  S.Remove(S.Front())
+	  return res
+}
+
+func (S *Stack) Peek() interface{} {
+	  if S.IsEmpty() {
+	  	return nil
+	  }
+	  return S.Front().Value
+}
+
+func (S *Stack) IsEmpty() bool {
+
+	  return S.Len() == 0
+}
+
+func NewStack() *Stack {
+	  return &Stack{*list.New()}
+}
+
+func main(){
+  stack := NewStack()
+  stack.Push(1)
+  stack.Push(2)
+  stack.Push(3)
+  fmt.Println(stack.Peek()) // 3
+  fmt.Println(stack.Pop()) // 3
+  fmt.Println(stack.Pop()) // 2
+  fmt.Println(stack.Pop()) // 1
+  fmt.Println(stack.IsEmpty())
+}
+`}  />
+

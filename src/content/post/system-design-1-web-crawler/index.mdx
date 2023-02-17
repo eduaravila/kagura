@@ -1,0 +1,95 @@
+---
+title: "web crawler system design"
+publishDate: "28 Apr 2022"
+description: "design a web crawler to discover new or updated content, the way it works, is by passing a seed URL."
+tags: ["system design", "web crawler", "distributed systems"]
+draft: false
+---
+
+# description
+design a web crawler to discover new or updated content, the way it works, is by passing a seed URL and it will traverse through the content of the page searching for new content, (similar to traversing a graph). you have all the resources you need to make it possible.
+
+![web crawler example](//images.ctfassets.net/tt922ph7a4na/36oXSooU8iBwHW7ZlBPO11/d6950d3a1ea73f76f3837ae2a26c3bd5/web_crawler_example.jpeg)
+
+# usages
+- data mining
+	- the web is huge so we can use the information to build recommendation systems, feed AI nodes, virtual map
+- search engines
+	- google uses a web crawler to feed their main service
+- site archiving (old websites)
+	- a web site, can face multiple stages or versions, to keep a timeline
+- web monitoring
+	- keep track of the behavior of the web, probably filter harmful content from your brand
+# constrains
+- search in a single web page
+- keep the content updated
+- check for loops
+- workers can go offline any time
+- system should be polite (limit number of request per site
+
+# main functionalities
+because of the potential of the project we'll limit the goals to:
+- given a set of URLS download, download and parse the body
+- search for relevant content, it might be html, images, new urls. in this case we only support text and URLS
+- save the content for future usage (persist data)\
+- pass this new URLS to the list
+- repeat steps
+
+# key features
+- extensibility,
+	-  we want the capability of possible scale or adding new features without the necessity of modifying the original structure
+- scalability
+	- because of the internet being massive and the possibility of the a web site updating, adding new content. We need a way to gracefully scale as the internet does.
+- robustness
+	- the web is full of skulduggery and errors the system needs a way of recognize and recover gracefully from errors that it may face
+- politeness
+	- is important to limit the number of request we send to foreign servers
+
+# blue print
+
+![web crawler blueprint](//images.ctfassets.net/tt922ph7a4na/4lVsxtvDpWaBtD1U9pQlVb/8e15a9bf047d2a861835d6336bedb053/web_crawler_blue_print.jpeg)
+
+### URL Seed
+the initial URLs that we pass to the system to start discovering from there, this set of URLs can be pre-selected to ensure the success of the flow.
+to keep it simple, the URL seed can get URLS from the url storage to keep the content updated
+
+### frontier
+this part of the system handles multiple responsibilities wort mentioning
+- politeness
+- priority
+	- this can mean multiple thing, for example
+		- home pages take priority
+		- pages with high probability of being updated
+- freshness
+	- this is a topic of active research [here's an insightful answers from stackoverflow](https://stackoverflow.com/questions/10331738/strategy-for-how-to-crawl-index-frequently-updated-webpages)
+
+### fetcher
+fetches and downloads the web page, also responsible of handling the request errors, we could re-insert the failed URLS back to the URL storage or add a message queue that URL seed will be subscribed, also is important to keep a retry limit to not fall on an infinite loop
+
+### monitoring
+check the heath of the system, also help us triggering alerts when something goes wrong and need manual checking
+- check statistics
+
+### parser
+parses or formats the data to a desired structure, to facilitate the data extraction from the web page
+
+### store
+stores relevant information on the database following, we could save the text or htmls on disk and keep the route on the database, assuming that some data doesn't need to live on the cache or primary memory
+
+### URL extractor
+extract relevant URLS from the parsed content
+
+### URL filter
+the main responsibility is to keep the content unique, meaning it's important to not have redundant information
+some of the reasons might be
+- different urls having the same content
+- duplicated urls
+- harmful content (blacklist)
+
+**important notes**
+
+- we use workers or bots to handle the urls
+- use message queue to handle parallel work
+- we could
+# updated blue print
+![web craweler blueprint v2](//images.ctfassets.net/tt922ph7a4na/iGEqLK9AogqDVLKOJSqMp/e6fb3cc2ccfc65b2463eeab7022fc4bf/web_crawlerv2.jpeg)

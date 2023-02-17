@@ -52,7 +52,7 @@ export default function ({ defaultCode }: props) {
 				Run
 			</button>
 			{result && (
-				<div className="border-t-2 border-dotted bg-bgColor py-2 font-mono text-lg">{result}</div>
+				<pre className="border-t-2 border-dotted bg-bgColor py-2 font-mono text-lg">{result}</pre>
 			)}
 		</div>
 	);
