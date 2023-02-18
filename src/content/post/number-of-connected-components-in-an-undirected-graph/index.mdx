@@ -1,0 +1,87 @@
+---
+title : "Number of Connected Components in an Undirected Graph"
+publishDate: "09 Mar 2022"
+description: "Write a function to find the number of connected components in an undirected graph."
+tags: ["data structures", "graph"]
+---
+
+import { Picture } from '@astrojs/image/components';
+import CodeBlock from '../../../components/blog/CodeBlock.jsx';
+import example1 from './example1.png';
+import example2 from './example2.png';
+
+> Given n nodes labeled from 0 to n - 1 and a list of undirected edges (each edge is a pair of nodes), write a function to find the number of connected components in an undirected graph.
+
+Example 1:
+     0          3
+     |          |
+     1 --- 2    4
+Given n = 5 and edges = [[0, 1], [1, 2], [3, 4]], return 2.
+
+<Picture src={example1} widths={[200, 400, 800]} sizes="(max-width: 800px) 100vw, 800px" alt="A rocket blasting off." />
+
+Example 2:
+     0           4
+     |           |
+     1 --- 2 --- 3
+Given n = 5 and edges = [[0, 1], [1, 2], [2, 3], [3, 4]], return 1.
+
+<Picture src={example2} widths={[200, 400, 800]} sizes="(max-width: 800px) 100vw, 800px" alt="A rocket blasting off." />
+
+Note:
+You can assume that no duplicate edges will appear in edges. Since all edges are undirected, [0, 1] is the same as [1, 0] and thus will not appear together in edges.
+
+# approach union find
+- check if the "left" vector has parent if not make it itself
+- the second vector parent will be left
+  - the compress part makes sure all the "children" vectors point to the root node and can get it in constant time
+  - also the diffent number of groups is equal to the response
+
+<CodeBlock
+  defaultCode={`
+package main
+import "fmt"
+
+func compress(parent map[int]int, vector int) {
+
+	root := parent[vector]
+	current := vector
+	stack := []int{}
+	for root != current {
+		stack = append(stack, current)
+		current = root
+		root = parent[root]
+	}
+
+	for _, val := range stack {
+		parent[val] = root
+	}
+}
+
+func NumberOfConnectedComponents(edges [][]int) int {
+	parent := make(map[int]int) // O(e)
+
+	for _, connection := range edges { // O(e) , e = len(edges)
+		if _, exist := parent[connection[0]]; !exist {
+			parent[connection[0]] = connection[0]
+		}
+		if _, exist := parent[connection[1]]; !exist {
+			parent[connection[1]] = connection[0]
+			compress(parent, connection[1]) // O(1) amortized
+		}
+	}
+	res := make(map[int]bool)
+	for _, val := range parent { // O(e)
+		res[val] = true
+	}
+	return len(res)
+}
+
+func main() {
+  fmt.Println(NumberOfConnectedComponents([][]int{{0, 1}, {1, 2}, {3, 4}}))
+  fmt.Println(NumberOfConnectedComponents([][]int{{0, 1}, {1, 2}, {2, 3}, {3, 4}}))
+}
+
+`}
+client:only="react"
+/>

@@ -11,6 +11,8 @@ interface props {
 
 export default function ({ defaultCode }: props) {
 	const [code, setCode] = useState(defaultCode);
+	const [isRunning, setIsRunning] = useState(false);
+
 	const theme = useTheme();
 	const [result, setResult] = useState("");
 	const runCode = async () => {
@@ -23,6 +25,8 @@ export default function ({ defaultCode }: props) {
 		};
 
 		try {
+			if (isRunning) return;
+			setIsRunning(true);
 			const res = await fetch(import.meta.env.PUBLIC_GOPLAYGROUND_API, options);
 			const data = await res.json();
 			console.log(data);
@@ -35,6 +39,7 @@ export default function ({ defaultCode }: props) {
 		} catch (error) {
 			setResult("Error: " + error);
 		}
+		setIsRunning(false);
 	};
 	const onChange = useCallback((value: string) => {
 		setCode(value);
@@ -48,7 +53,11 @@ export default function ({ defaultCode }: props) {
 				onChange={onChange}
 				theme={theme}
 			/>
-			<button onClick={runCode} className="my-2 rounded bg-blue-300 py-2 px-4 text-white">
+			<button
+				onClick={runCode}
+				className="my-2 rounded bg-blue-300 py-2 px-4 text-white"
+				disabled={isRunning}
+			>
 				Run
 			</button>
 			{result && (
