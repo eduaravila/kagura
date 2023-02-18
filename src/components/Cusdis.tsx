@@ -41,7 +41,7 @@ function ReactCusdis(props: {
 	return (
 		<div
 			id="cusdis_thread"
-			className="mt-14 font-serif"
+			className="my-5 font-serif"
 			data-host={host}
 			data-page-id={props.attrs.pageId}
 			data-app-id={props.attrs.appId}
