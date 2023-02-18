@@ -44,7 +44,7 @@ export default function ({ defaultCode }: props) {
 	const onChange = useCallback((value: string) => {
 		setCode(value);
 	}, []);
-	console.log(process.env);
+
 	console.log(import.meta.env);
 
 	return (
