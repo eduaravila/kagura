@@ -15,6 +15,7 @@ on:
 env:
   BUILD_PATH: "." # default value when not using subfolders
   # BUILD_PATH: subfolder
+
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
@@ -63,16 +64,13 @@ jobs:
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
         working-directory: ${{ env.BUILD_PATH }}
       - name: Build with Astro
-
         run: |
-          touch .env
-          echo PUBLIC_GOPLAYGROUND_API=${{ secrets.PUBLIC_GOPLAYGROUND_API }} >> .env
-          echo PUBLIC_GOPLAYGROUND_API2=${{ vars.PUBLIC_GOPLAYGROUND_API }} >> .env
-          cat .env
           ${{ steps.detect-package-manager.outputs.runner }} astro build \
             --site "${{ steps.pages.outputs.origin }}" \
             --base "${{ steps.pages.outputs.base_path }}"
         working-directory: ${{ env.BUILD_PATH }}
+        env:
+          PUBLIC_GOPLAYGROUND_API: ${{secrets.PUBLIC_GOPLAYGROUND_API}}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:

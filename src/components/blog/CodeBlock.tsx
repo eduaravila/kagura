@@ -29,8 +29,6 @@ export default function ({ defaultCode }: props) {
 			setIsRunning(true);
 			const res = await fetch(import.meta.env.PUBLIC_GOPLAYGROUND_API, options);
 			const data = await res.json();
-			console.log(data);
-
 			if (data.Events === null || data.Events.length === 0) {
 				setResult(data.Errors);
 			} else {
@@ -63,7 +61,6 @@ export default function ({ defaultCode }: props) {
 			{result && (
 				<pre className="border-t-2 border-dotted bg-bgColor py-2 font-mono text-lg">{result}</pre>
 			)}
-			<p>{JSON.stringify(import.meta.env)}</p>
 		</div>
 	);
 }
