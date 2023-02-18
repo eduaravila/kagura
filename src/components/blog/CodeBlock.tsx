@@ -44,6 +44,8 @@ export default function ({ defaultCode }: props) {
 	const onChange = useCallback((value: string) => {
 		setCode(value);
 	}, []);
+	console.log(process.env);
+	console.log(import.meta.env);
 
 	return (
 		<div className="mb-2">
@@ -63,7 +65,6 @@ export default function ({ defaultCode }: props) {
 			{result && (
 				<pre className="border-t-2 border-dotted bg-bgColor py-2 font-mono text-lg">{result}</pre>
 			)}
-			<p>{JSON.stringify(import.meta.env)}</p>
 		</div>
 	);
 }
