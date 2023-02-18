@@ -27,7 +27,7 @@ export default function ({ defaultCode }: props) {
 		try {
 			if (isRunning) return;
 			setIsRunning(true);
-			const res = await fetch(process.env.PUBLIC_GOPLAYGROUND_API, options);
+			const res = await fetch(import.meta.env.PUBLIC_GOPLAYGROUND_API, options);
 			const data = await res.json();
 			console.log(data);
 
