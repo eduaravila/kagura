@@ -10,7 +10,7 @@ import react from "@astrojs/react";
 
 // https://astro.build/config
 export default defineConfig({
-	site: "https://www.astro-theme-cactus.netlify.app/",
+	site: "https://eduaravila.github.io/",
 	markdown: {
 		shikiConfig: {
 			theme: "nord",
