@@ -1,5 +1,6 @@
 ---
 import BlogHero from "@/components/blog/Hero";
+import Newsletter from "@/components/Newsletter";
 
 import type { CollectionEntry } from "astro:content";
 import Cusdis from "../components/Cusdis";
@@ -88,5 +89,6 @@ const { headings } = await post.render();
 			<path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"></path>
 		</svg>
 	</button>
+  <Newsletter />
 	<Cusdis PAGE_ID={title} PAGE_TITLE={title} PAGE_URL={title} client:load />
 </BaseLayout>
