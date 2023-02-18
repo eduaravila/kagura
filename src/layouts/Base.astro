@@ -26,7 +26,7 @@ const {
 		const colorThemeMetaTag = document.querySelector("meta[name='theme-color']");
 
 		// get user preference of dark mode, 1st local storage, 2nd browser
-		function getThem ePreference() {
+		function getThemePreference() {
 			if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
 				return localStorage.getItem("theme");
 			}
