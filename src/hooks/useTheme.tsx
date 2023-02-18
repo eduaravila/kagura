@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 const useTheme = () => {
-	function getThemePreference(): string {
+	const getThemePreference = useCallback(() => {
 		if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
 			return localStorage.getItem("theme") as string;
 		}
@@ -9,7 +9,7 @@ const useTheme = () => {
 			return "light";
 		}
 		return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-	}
+	}, [window]);
 
 	const [theme] = useState<"light" | "dark" | "auto">(
 		getThemePreference() as "light" | "dark" | "auto"
