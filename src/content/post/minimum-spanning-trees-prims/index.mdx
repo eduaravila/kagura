@@ -1,0 +1,111 @@
+---
+title: "Minimum Spanning Trees (Prims)"
+publishDate: "25 Feb 2022"
+description: "Graphs - Minimum Spanning Trees (Prims) the goal is to get a"
+tags: ["algorithms", "data structures", "graphs", "minimum spanning trees", "prims"]
+draft: false
+---
+
+## minimumSpanningTrees (prims)
+```go
+  visited []bool
+  weights []heap
+  path []*Edge
+```
+
+> the goal is to get a path with all of the edges / vectors that have the minimum weights, for example you can compare the weights with "money" we this algorithm could help us build the cheapest road (edges) that connects all of the vectors
+
+- we need to initialize the data structures
+	- visited all start as false
+	- weights are all of the edges so we need the complete edge, \{from: vector, to: vector.edges.front(), weight: inf\}, we mark the weights to be equal to inf
+	- path will start with nil pointer
+	- after that we choose the starting vector and update
+		- visited[s] = true
+		- weights[s] = 0
+
+
+![prims](//images.ctfassets.net/tt922ph7a4na/2FNA3nugScxASWIumsDV44/ca6176126704d73c13efb18c685ad816/prims.jpg)
+
+### code
+
+```go
+type GraphVector struct {
+	val   interface{}
+	key   int
+	edges linkedList.SentinelList
+	index int
+}
+
+type EdgeWithSource struct {
+	to     *GraphVector
+	from   *GraphVector
+	weight int
+}
+
+
+/**
+* initialize all the data structures, visited to keep track of the visited vectors
+* path to get a route from the children to the parent vector
+* and a heap to choose the shortest / cheapest edge every time
+ */
+func (G *GraphAL) initializePrims() ([]bool, []*EdgeWithSource, heap.Heap) {
+	visited := make([]bool, G.size)
+	var h heap.Heap = heap.NewHeap()
+	minH := heap.NewMinHeap()
+	h.SetType(minH)
+
+	start := G.vectors[0]
+	inf := int(^uint(0) >> 1)
+	for _, vector := range G.vectors {
+		weight := inf
+		if vector == start {
+			weight = 0
+		}
+		h.Insert(inf, &Edge{vector: vector, weight: weight})
+	}
+	path := make([]*EdgeWithSource, G.size)
+	visited[start.index] = true
+	path[start.index] = &EdgeWithSource{from: start, to: start, weight: 0}
+	return visited, path, h
+}
+
+/**
+* try to relax the edges
+* search in the heap for the vector index and compares the vector
+* weight with the edge weight or from -> to. and then updates the
+* Edge and the heap
+ */
+func relaxEdges(a *Edge, weights heap.Heap) bool {
+	if bi := weights.Find(func(hn *heap.HeapNode) bool {
+		return hn.Val().(*Edge).vector.index == a.vector.index && a.weight < hn.Key()
+	}); bi > -1 {
+		weights.Update(bi, a.weight, a)
+		return true
+	}
+	return false
+}
+
+func (G *GraphAL) MinSpanningTreePrim() []*EdgeWithSource {
+	visited, path, weights := G.initializePrims()
+
+	current := weights.RemoveTop()
+	for current != nil && current.Val() != nil {
+		currentV := current.Val().(*Edge)
+		visited[currentV.vector.index] = true
+
+		edge := currentV.vector.edges.FrontNode()
+		for edge != nil && edge.Val() != nil {
+			edgeVal := edge.Val().(*Edge)
+			if !visited[edgeVal.vector.index] {
+				if relaxEdges(edgeVal, weights) {
+					path[edgeVal.vector.index] = &EdgeWithSource{from: currentV.vector, to: edgeVal.vector, weight: edgeVal.weight}
+				}
+			}
+			edge = edge.Next()
+		}
+		current = weights.RemoveTop()
+	}
+	return path
+}
+
+```

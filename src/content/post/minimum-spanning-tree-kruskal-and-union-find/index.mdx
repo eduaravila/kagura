@@ -1,0 +1,193 @@
+---
+title: "minimum spanning tree kruskals"
+publishDate: "25 Feb 2022"
+description: "minimum spanning tree kruskals implementation in golang"
+tags: ["algorithms", "data structures", "go", "golang", "graph", "graph algorithms", "minimum spanning tree", "kruskals"]
+draft: false
+---
+
+### UnionFind
+
+> with union find we'll keep track of set of groups, in general we connect a root element with it's children, each root node will be equal to a group
+
+- we initialize an array of elements or nodes, the node could have a key and a value, at the start the values on the array point to nil
+- to find an element group, we need the index of the element and we iterate until we find the root element, then return the index of the root
+- to make a union, we do a **find(a)** and **find(b)** then we update the parent of one of the root it could be find(a) -> find(b). This only if the roots / groups are different
+
+//interface.go
+```go
+package unionFind
+
+type UnionFindNode struct {
+	parent int
+	val    interface{}
+}
+
+type UnionFind struct {
+	root []*UnionFindNode
+	size int
+}
+
+type UnionFindInterface interface {
+	Find(int) int
+	Union(int, int) bool
+	Insert(int, interface{}) int
+	Size() int
+}
+
+func NewUnionFindNode() *UnionFindNode {
+	return &UnionFindNode{}
+}
+
+func NewUnionFind() *UnionFind {
+	return &UnionFind{}
+}
+
+func (U *UnionFindNode) Val() interface{} {
+	return U.val
+}
+
+func (U *UnionFindNode) Key() interface{} {
+	return U.parent
+}
+
+```
+
+// union.go
+```go
+
+package unionFind
+
+func (U *UnionFind) compress(root int, stack []int) {
+	for _, node := range stack {
+		U.root[node].parent = root
+	}
+}
+
+func (U *UnionFind) Find(index int) int {
+
+	if len(U.root) < 1 {
+		return -1
+	}
+
+	stack := make([]int, len(U.root))
+
+	current := index
+	root := current
+	for range U.root {
+		p := U.root[current]
+		if U.root[current].parent == current {
+			root = current
+			break
+		}
+		stack = append(stack, current)
+		current = p.parent
+	}
+	U.compress(root, stack)
+	return root
+}
+
+func (U *UnionFind) Union(a, b int) bool {
+	rootA := U.Find(a)
+	rootB := U.Find(b)
+
+	if rootA != rootB {
+		U.root[rootA].parent = rootB
+		return true
+	}
+	return false
+}
+
+func (U *UnionFind) Insert(key int, val interface{}) int {
+	U.root = append(U.root, &UnionFindNode{parent: key, val: val})
+	U.size++
+	return U.size - 1
+}
+
+func (U *UnionFind) Size() int {
+	return U.size
+}
+
+```
+
+#### compression
+to optimize the find times to be almost amortized constant, we could use compression
+
+```
+input = [0,0,1,2,3,4,5,6]
+
+0 <- 0 <- 1 <- 2 <- 3 <- 4 <- 5 <- 6
+
+with this we have a lot of nested nodes if we wanted to make a Find operation this would take linear time
+
+if we updated the parent of all the children nodes to be equal to the root we would end up with
+
+0 <- 0
+0 <- 1
+0 <- 2
+0 <- 3
+0 <- 4
+0 <- 5
+0 <- 6
+
+```
+- a good time to execute this would be at the find step
+
+- if the parent of the current node is not equal to the root, add it to a stack
+- do this until you reach the root
+- update all the elements of the stack to point to the root
+
+### MinimumSpanninTreeKruskals
+
+> similar to prims, we can get the minSpanning tree on a graph, but in this case the implementation it's much more 'easier' to implement
+
+edges [] Edges // ordered by weight
+groups UnionFind of all the vectors
+
+- start initializing the data structures, we could use a heap / heapSort for the edges, and then fill the unionFind with nil pointer at the beginning
+- iterate through the heap (or all the edges)
+	- compare the groups of the edge connection, find(from) != find(to) then you can make a union union(from,to) this means if the vectors are not connected then connect them
+	- if the vectors are part of the same group then you can omit and go to the next edge
+
+![kruskal's](//images.ctfassets.net/tt922ph7a4na/4XTR726u6xxJwPgju9HotL/5e3d51b57a99c4ab0da091450a697497/kruskals.jpg)
+
+```go
+
+func (G *GraphAL) initializeKruskals() (heap.Heap, unionFind.UnionFind) {
+	var edges heap.Heap = heap.NewHeap()
+	minH := &heap.MinHeap{}
+	edges.SetType(minH)
+	var groups unionFind.UnionFind = *unionFind.NewUnionFind()
+
+	for _, vector := range G.vectors {
+		edge := vector.edges.FrontNode()
+		for edge != nil && edge.Val() != nil {
+			edgeVal := edge.Val().(*Edge)
+			edges.Insert(edgeVal.weight, &EdgeWithSource{from: vector, to: edgeVal.vector, weight: edgeVal.weight})
+			edge = edge.Next()
+		}
+		groups.Insert(vector.index, vector)
+	}
+	return edges, groups
+}
+
+func (G *GraphAL) MinSpanningTreeKruskals() []*EdgeWithSource {
+	edges, groups := G.initializeKruskals()
+	path := []*EdgeWithSource{}
+
+	edge := edges.RemoveTop()
+
+	for edge != nil && edge.Val() != nil {
+		edgeVal := edge.Val().(*EdgeWithSource)
+
+		if groups.Union(edgeVal.from.index, edgeVal.to.index) {
+			path = append(path, edgeVal)
+		}
+		edge = edges.RemoveTop()
+	}
+
+	return path
+}
+
+```
+
