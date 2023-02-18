@@ -76,7 +76,8 @@ jobs:
         working-directory: ${{ env.BUILD_PATH }}
       - name: Build with Astro
         run: |
-          echo "PUBLIC_GOPLAYGROUND_API: $PUBLIC_GOPLAYGROUND_API" >> .env
+          touch .env
+          echo "PUBLIC_GOPLAYGROUND_API=$PUBLIC_GOPLAYGROUND_API" >> .env
           ${{ steps.detect-package-manager.outputs.runner }} astro build \
             --site "${{ steps.pages.outputs.origin }}" \
             --base "${{ steps.pages.outputs.base_path }}"
