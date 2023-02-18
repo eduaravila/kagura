@@ -65,9 +65,10 @@ jobs:
       - name: Build with Astro
 
         run: |
-          touch .env \
-          echo PUBLIC_GOPLAYGROUND_API=${{ secrets.PUBLIC_GOPLAYGROUND_API }} >> .env \
-          echo PUBLIC_GOPLAYGROUND_API2=${{ vars.PUBLIC_GOPLAYGROUND_API }} >> .env \
+          touch .env
+          echo PUBLIC_GOPLAYGROUND_API=${{ secrets.PUBLIC_GOPLAYGROUND_API }} >> .env
+          echo PUBLIC_GOPLAYGROUND_API2=${{ vars.PUBLIC_GOPLAYGROUND_API }} >> .env
+          cat .env
           ${{ steps.detect-package-manager.outputs.runner }} astro build \
             --site "${{ steps.pages.outputs.origin }}" \
             --base "${{ steps.pages.outputs.base_path }}"
