@@ -34,8 +34,8 @@ jobs:
     - name: Make envfile
       uses: SpicyPizza/create-envfile@v1.3
       with:
-        PUBLIC_GOPLAYGROUND_API: ${{secrets.PUBLIC_GOPLAYGROUND_API}}
-        PUBLIC_GOPLAYGROUND_API2: ${{vars.PUBLIC_GOPLAYGROUND_API}}
+        envkey_PUBLIC_GOPLAYGROUND_API: ${{secrets.PUBLIC_GOPLAYGROUND_API}}
+        envkey_PUBLIC_GOPLAYGROUND_API2: ${{vars.PUBLIC_GOPLAYGROUND_API}}
 
   build:
     name: Build
