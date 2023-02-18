@@ -1,0 +1,92 @@
+---
+title: "topological sort and strongly connected components"
+publishDate: "22 Feb 2022"
+description: "topological sort and strongly connected components in go"
+tags: ["go", "algorithms", "data structures", "graphs"]
+draft: false
+---
+
+
+
+## topological sort
+
+start *Vector
+path [] *Vector
+- run on a directed acyclic graph
+- run dfs
+	- we need a starting point
+	- we find the "sinks" vectors and add them to the path, this is the same of processing a vector
+- return reversed path
+
+```go
+func (GD *GraphDirected) TopologicalSort(G *GraphAL) []*GraphVector {
+	if G.size < 1 || G.HasCycle() {
+		return nil
+	}
+	path := []*GraphVector{}
+	visited := make([]bool, G.size)
+	for _, vector := range G.vectors {
+		G.dfsWithCallback(vector, &visited, func(gv *GraphVector) {}, func(gv *GraphVector) {
+			path = append([]*GraphVector{gv}, path...)
+		})
+	}
+	return path
+}
+
+```
+
+![topologicalsort](//images.ctfassets.net/tt922ph7a4na/iMOUA3gEN06FBBjamG4RA/21cf5a13692e491ce784ec10ee362c0f/topologicalsort.jpg)
+
+![topologicalsortcycle](//images.ctfassets.net/tt922ph7a4na/3nnDKJuD9aHxJgyZNLXVdt/cd2e635c5e56406fed53a4008ae011ae/topologicalsortcycle.jpg)
+
+## StronglyConnectedComponentsList
+componentslist [][]*Vector
+
+- reverse the graph
+- get the counter and store in a queue being the first element the one with the biggest count
+- reverse
+- run dfs in the queue order with the original graph
+	- append to the componentlist[counter] += vector, the current visited vector or the current component
+- every time you finish with dfs increase the counter, this is to add a new component to the componentlist
+
+```go
+
+func (G *GraphAL) StronglyConnectedComponentsList() [][]*GraphVector {
+	G.Reverse()
+	postorderVectors := G.TimesDfsVectors()
+	G.Reverse()
+	counter := 0
+	componentlist := [][]*GraphVector{}
+	visited := make([]bool, G.size)
+	for i := G.size - 1; i >= 0; i-- {
+		vector := postorderVectors[i]
+		if !visited[vector.index] {
+			componentlist = append(componentlist, []*GraphVector{})
+			G.dfsWithCallback(vector, &visited, func(gv *GraphVector) {}, func(gv *GraphVector) {
+				componentlist[counter] = append(componentlist[counter], gv)
+			})
+			counter++
+		}
+	}
+	return componentlist
+}
+
+```
+
+## checkForReverseCycle()
+
+> we want to check before we reverse the edges if the vector is already present in the list of edges of the other vector, if true then we have a cycle between the vectors
+
+```go
+func (G *GraphAL) interconnected(a, b *GraphVector) bool {
+	current := b.edges.FrontNode()
+	for current != nil && current.Val() != nil {
+		if current.Val().(*GraphVector) == a {
+			return true
+		}
+		current = current.Next()
+	}
+
+	return false
+}
+```

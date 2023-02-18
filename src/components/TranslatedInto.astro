@@ -1,0 +1,20 @@
+---
+import { supportedLanguages } from 'i18n';
+
+interface Props{
+  locales: string[]
+  slug: string
+}
+
+const { locales,slug } = Astro.props;
+---
+<div class="translations w-full border-white border-2 p-3 rounded break-keep my-4">
+  <p>
+    Translated into:
+      {
+        locales?.map( (language, i )=> <>
+        { i > 0 && " • "}<a class="underline" href={`/${language}/posts/${slug}`}>{supportedLanguages[language] as string}</a>
+        </>)
+      }
+  </p>
+</div>

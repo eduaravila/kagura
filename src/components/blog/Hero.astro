@@ -1,19 +1,24 @@
 ---
 import { getFormattedDate } from "@/utils";
 import type { CollectionEntry } from "astro:content";
+import TranslatedInto from "../TranslatedInto.astro";
 
 interface Props {
 	content: CollectionEntry<"post">;
+  locales: string[];
+
 }
 
-const { content } = Astro.props;
-
+const { content, locales } = Astro.props;
+const {post } = Astro.params
 const datetime = content.data.publishDate.toISOString();
 const postDate = getFormattedDate(content.data.publishDate);
 ---
 
 <h1 class="title">{content.data.title}</h1>
 <time datetime={datetime}>{postDate}</time>
+
+
 {
 	!!content.data.tags?.length && (
 		<div class="inline before:content-['|']">
@@ -49,4 +54,6 @@ const postDate = getFormattedDate(content.data.publishDate);
 		</div>
 	)
 }
+
+<TranslatedInto slug={post} locales={locales} />
 <p class="mt-8">{content.data.description}</p>

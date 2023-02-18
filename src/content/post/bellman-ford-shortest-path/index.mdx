@@ -1,0 +1,62 @@
+---
+title: "Shortest Path Algorithms - Dijkstra and Bellman-Ford"
+publishDate: "25 Feb 2022"
+description: "Dijkstra and Bellman-Ford are two algorithms that can be used to find the shortest path between two nodes in a graph"
+tags: ["algorithms", "graphs", "shortest path", "dijkstra", "bellman-ford"]
+draft: false
+---
+
+## bellmanFord
+
+> similar to dijkstra we can find the shortest path, but we'll end up if we find a negative cycle, because with this cycle we could just choose the final weight by iterating over and over through the same cycle
+
+`
+weights []*Edge
+edges [] {from: *Vector, Edge}
+` // this will be a connection between the source vector and the neighbors with it's weights
+
+- initialize weights, edges
+	- iterate through G.vectors and append `edges = append(edges, {from, vector, edge, current})` // in this case we are using an adjacency list with linked list
+	- and weights[vector.index] = `edge{vector, weight: inf}`
+- update the weight of the starting vector weights[start.index] = 0, this will let the algorithm react to weight changes
+- iterate through each vertex
+	- iterate through each edge // edges array
+		- relax the edges and update the weights if necessary
+- we'll iterate through the edges once more and if we detect a successful relax, then this means that there's a negative cycle
+
+```go
+
+func (G *GraphAL) BellmanFord(start, end *GraphVector) ([]*Edge, []*GraphVector) {
+	weights := G.initWeightQueue() // O(V)
+	edges := G.initEdgesList()     // (VE)
+	path := make([]*GraphVector, G.size)
+	path[start.index] = start
+	weights[start.index].weight = 0
+
+	for range G.vectors { // O (VE)
+		for _, edge := range edges {
+			if G.relax(&weights, edge.from, &Edge{vector: edge.to, weight: edge.weight}) {
+				path[edge.to.index] = edge.from
+			}
+
+		}
+	}
+
+	for _, edge := range edges { // O(E)
+		if G.checkRelax(&weights, edge.from, &Edge{vector: edge.to, weight: edge.weight}) {
+			return nil, nil
+		}
+	}
+	temp := []*GraphVector{}
+	current := end
+	for current != path[current.index] { // O(V)
+		temp = append([]*GraphVector{current}, temp...)
+		current = path[current.index]
+		if current == path[current.index] {
+			temp = append([]*GraphVector{current}, temp...)
+		}
+	}
+	return weights, temp
+}
+
+```

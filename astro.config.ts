@@ -13,7 +13,7 @@ export default defineConfig({
 	site: "https://www.astro-theme-cactus.netlify.app/",
 	markdown: {
 		shikiConfig: {
-			theme: "dracula",
+			theme: "nord",
 			wrap: true,
 		},
 	},

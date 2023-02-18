@@ -9,6 +9,13 @@ import { getLocaleFromPostId,getNonDraftPosts } from "src/utils/post";
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
 	let allPosts: CollectionEntry<"post">[] = await getCollection("post");
 	allPosts = getNonDraftPosts(allPosts);
+
+  const allLocalesPerPost = allPosts.reduce((prev,post)=> {
+    const locale = getLocaleFromPostId(post.id);
+    const slug = post.slug.split("/")[0];
+    return {...prev, [slug]:[...prev[slug] || [], locale]}
+  },{} as {[key:string]:string[]})
+
 	const allPaths = allPosts.map(({ id, slug, ...post }) => {
 		slug = slug.split("/")[0];
 		return {
@@ -17,10 +24,12 @@ export async function getStaticPaths(): Promise<GetStaticPathsResult> {
 				locale: getLocaleFromPostId(id),
 			},
 			props: {
+        locales: allLocalesPerPost[slug].filter((locale)=>locale !== getLocaleFromPostId(id)),
 				post,
 			},
 		};
 	});
+
 
 	const fallbackPaths = allPosts
 		.filter(({ id }) => getLocaleFromPostId(id) === fallbackLanguage)
@@ -31,6 +40,7 @@ export async function getStaticPaths(): Promise<GetStaticPathsResult> {
 					locale: undefined,
 				},
 				props: {
+          locales: allLocalesPerPost[slug].filter((locale)=>locale !== fallbackLanguage),
 					post,
 				},
 			};
@@ -42,12 +52,13 @@ export async function getStaticPaths(): Promise<GetStaticPathsResult> {
 
 interface Props {
 	post: CollectionEntry<"post">;
+  locales: string[];
 }
 
-const { post } = Astro.props;
+const { post, locales  } = Astro.props;
 const { Content } = await post.render();
 ---
 
-<PostLayout post={post}>
+<PostLayout post={post} locales={locales}>
 	<Content />
 </PostLayout>

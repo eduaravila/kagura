@@ -7,9 +7,10 @@ import BaseLayout from "./Base.astro";
 
 interface Props {
 	post: CollectionEntry<"post">;
+  locales: string[];
 }
 
-const { post } = Astro.props;
+const { post, locales} = Astro.props;
 const {
 	data: { title, description, ogImage, publishDate },
 	slug,
@@ -39,12 +40,18 @@ const { headings } = await post.render();
 </script>
 
 <BaseLayout meta={{ title, description, articleDate, ogImage: socialImage }}>
+
 	<div class="sm:grid sm:grid-cols-[3fr_1fr] sm:items-start sm:gap-x-10">
 		<article class="break-words">
-			<div id="blog-hero"><BlogHero content={post} /></div>
+
+			<div id="blog-hero">
+        <BlogHero content={post} locales={locales} />
+      </div>
+
 			<div
 				class="prose prose-sm prose-cactus mt-12 prose-headings:font-semibold prose-headings:before:absolute prose-headings:before:-ml-4 prose-headings:before:text-accent prose-headings:before:content-['#'] prose-th:before:content-none"
 			>
+
 				<slot />
 			</div>
 		</article>

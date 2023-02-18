@@ -1,0 +1,809 @@
+---
+title: "BFS and DFS appications"
+publishDate: "20 Feb 2022"
+description: "BFS and DFS bipartite, hasCycle, strongly connected components and more"
+tags: ["algorithms", "data structures", "graphs", "trees", "bfs", "dfs"]
+draft: false
+---
+
+
+
+# bipartite
+
+two coloring graphs
+> build an algorithm to know if a graph can be colored (vertex) with only two colors without conflicts using only two colors (BFS)
+
+![isbipartite](//images.ctfassets.net/tt922ph7a4na/gxLeeU3dSzfFoKTe5csJC/518415f3aa2453249aa20d3ea96d4e42/bipartite.jpg)
+
+![nobipartite](//images.ctfassets.net/tt922ph7a4na/4uPnL0pPCiJA2PxwEw5ALQ/bbd0ed4f2c9b94fca8e669d8ac8d4e76/notbipartite.jpg)
+
+### isBipartite
+colors []string
+bipartite = true
+- iterate through all the vertex
+	- check that the current has not been visited
+		- assign white to the current vertex
+	- run a bfs and in every edge processing
+		- check if the color of both vertex is different
+			- if true then assign the opposite color
+			- if false then the graph is not bipartite
+
+```go
+
+func getOpositeColor(a colors) colors {
+	if a == WHITE {
+		return BLACK
+	}
+	return WHITE
+}
+
+func isValidColoring(a int, b int, colors *[]colors) (bool, error) {
+	if (*colors)[a] == (*colors)[b] {
+		return false, errors.New("SAME COLOR")
+	}
+	if (*colors)[b] == "" {
+		(*colors)[b] = getOpositeColor((*colors)[a])
+	}
+	return true, nil
+}
+
+func (G *GraphAL) IsBipartite() bool {
+	if G.size < 1 {
+		return true
+	}
+	bipartite := true
+	visited := make([]bool, G.size)
+	colors := make([]colors, G.size)
+	start := G.vectors[0]
+	for _, vector := range G.vectors {
+		if !visited[vector.index] && bipartite {
+
+			colors[vector.index] = WHITE // default if the vector has not been visited
+			G.BFS(start, func(a *GraphVector, b *GraphVector) {
+				visited[a.index] = true
+				visited[b.index] = true
+				if _, err := isValidColoring(a.index, b.index, &colors); err != nil {
+					bipartite = false
+				}
+			})
+		}
+	}
+
+	return bipartite
+}
+
+```
+
+### hasCycle (undirected)
+parent [] *Vector
+
+- we need to run dfs
+- mark the start parent as itself
+- in the process edge step we need to check if the edge vector is not equal to the parent and check that the vector has no parent
+	- if true continue
+	- if false then there is a cycle
+
+```go
+func (G *GraphAL) HasCycle() bool {
+	if G.size < 1 {
+		return false
+	}
+	parent := make([]*GraphVector, G.size)
+	visited := make([]bool, G.size)
+	cycle := false
+	for _, vector := range G.vectors {
+		if !visited[vector.index] {
+			parent[vector.index] = vector
+			G.BFS(vector, func(gv1, gv2 *GraphVector) {
+				visited[gv1.index] = true
+				if !validParent(gv1, gv2, &parent) {
+					cycle = true
+				}
+			})
+		}
+	}
+	return cycle
+}
+```
+
+## quick optimization (add vectors)
+> instead of doing a linear search for the vector, we add the index in the vector itself or update the index according to the position to where it will be saved
+
+```go
+type GraphVector struct {
+	val   interface{}
+	key   int
+	edges linkedList.SentinelList
+	index int // add new field
+}
+```
+
+```go
+func (G *GraphAL) addToVectors(vector *GraphVector) int {
+	if vectorIFrom := G.getVectorIndex(vector); vectorIFrom > -1 {
+		return vectorIFrom
+	} else {
+
+		G.vectors = append(G.vectors, vector)
+		vector.index = G.size
+		G.size++
+		return len(G.vectors) - 1
+	}
+}
+```
+
+for example here we just use the Vector.index prop to get the correct position, instead of searching each time this reduces the previous time of O(V^2 + E) to O(V + E)
+
+### stronglyConnectedComponents
+
+counter := 0
+visited *Vector
+reversed
+- we reverse the graph
+- call times() to get the sink in the reversed graph
+- iterate through the original graph vectors starting with the first element of the counter function, with this we get the reversed sinks, but we run dfs on the original graph
+- run graph.times() to get the counters, with the counters we'll get the 'sinks' if we use a stack then we process the first element (stack.pop())
+	- we run a dfs starting with the popped stack element
+	- increase the counter, counter++, this will be after we finish the dfs
+
+// connected.go
+
+```go
+func (G *GraphAL) StronglyConnectedComponents() int {
+
+	G.Reverse()
+	postorderVectors := G.TimesDfsVectors()
+	G.Reverse()
+	counter := 0
+
+	visited := make([]bool, G.size)
+	for i := G.size - 1; i >= 0; i-- {
+		vector := postorderVectors[i]
+		if !visited[vector.index] {
+
+			vector.edges.FrontNode().Display()
+			G.dfsWithCallback(vector, &visited, func(gv *GraphVector) {}, func(gv *GraphVector) {
+
+			})
+			counter++
+		}
+	}
+	return counter
+}
+
+```
+
+**examples**
+
+here we get 5
+![stronglyconnected5](//images.ctfassets.net/tt922ph7a4na/2lWljVlCFH8imNG6Tp8a17/9c81d33fbd5763e5ed0ca22efa842f92/stronglyconnected5.jpg)
+
+here we get 1
+![stronglyconnected1](//images.ctfassets.net/tt922ph7a4na/1hsPlpklJ037BfSSdtxndv/5b7c95e5be922e8a4d9c3c9d4171e083/stronglyconnected1.jpg)
+
+here we get 7
+![stronglyconnected7](//images.ctfassets.net/tt922ph7a4na/1xhSwBOfW5BfuiJW12cl4O/01da7fcaa664f38f5d806c93b3919732/stronglyconnected7.jpg)
+
+---
+
+### times
+> count the number of steps with DFS, meaning every vector will have a start and end time, start = first time process, end when you have processed all of it's neighbors
+
+times [][]int
+visited []bool
+counter int
+
+- run DFS on all the vectors
+- times[current][0] = counter
+- counter++
+- on the late processing do the same but in the end
+- times[current][0] = counter
+- counter++
+
+ **example**
+
+![counter](//images.ctfassets.net/tt922ph7a4na/6fGcJVpL8hSppJrRjhoD53/e0eb9fff87608b209b6fffb51fffc54f/counter.jpg)
+
+![counterR](//images.ctfassets.net/tt922ph7a4na/wBa7qKyktmZFEoVLSr5a5/f03cb7cdac00c77d5fd566ca1487d599/counterR.jpg)
+
+// counter.go
+```go
+func (G *GraphAL) TimesDfs() []time {
+	if G.size < 1 {
+		return nil
+	}
+	times := make([]time, G.size)
+	visited := make([]bool, G.size)
+	counter := 1
+	for _, vector := range G.vectors {
+
+		if !visited[vector.index] {
+			G.DfsWithCallback(vector, func(a *GraphVector) {
+				times[a.index].start = counter
+				counter++
+			}, func(a *GraphVector) {
+				times[a.index].end = counter
+				counter++
+			}, &visited)
+		}
+	}
+	return times
+}
+```
+
+### reverse (BFS)
+- we need to arrays
+- visited // to not re-visit vectors
+- parents // to not re-reverse edges, a vector can have multiple parents
+- we need to go through all the edges of the current vector
+- we will switch the direction of the edges
+	- check if the current child is not equal to one parent, this means that we already reversed this edge
+		- if true omit this step
+		- if false
+			- update the parent  parent[to].append(from)
+			- this means vector[from] = to will be vector[to] = from
+			- and we add "to" to the queue
+
+__note that we return bool in the bfs callback this is to omit the traversal if invalid parent vectors__
+
+reverse.go
+```go
+
+func (G *GraphAL) reverseEdges(a, b *GraphVector) {
+	G.Edge(b, a)
+
+	a.edges.PopFront() // remove the connection
+package graphs
+
+func (G *GraphAL) reverseEdges(a, b *GraphVector) {
+	G.Edge(b, a)
+
+	a.edges.PopFront() // remove the connection
+}
+
+func (G *GraphAL) validParent(parents [][]*GraphVector, a, b *GraphVector) bool {
+	for _, val := range parents[a.index] {
+		if val == b {
+			return false
+		}
+	}
+	return true
+}
+
+func (GD *GraphDirected) Reverse(G *GraphAL) {
+
+	if G.size < 1 {
+		return
+	}
+
+	parents := make([][]*GraphVector, G.size)
+
+	for _, vector := range G.vectors {
+
+		parents[vector.index] = append(parents[vector.index], vector)
+		G.BFS(vector, func(parent, currentV *GraphVector) bool {
+			if G.validParent(parents, parent, currentV) {
+				parents[currentV.index] = append(parents[currentV.index], parent) // we update the parent to not re-reverse
+				G.reverseEdges(parent, currentV)
+
+				return true
+			}
+			// to save some time we return true if the neighbor is invalid and we this we same time omiting that vector
+			return false
+		})
+
+	}
+}
+
+## complete code
+
+// adjlist.go
+
+```go
+package graphs
+
+import (
+	"errors"
+	"fmt"
+	linkedList "goudemy/linkedList/lib"
+)
+
+type colors string
+
+type time struct {
+	start int
+	end   int
+}
+
+const (
+	WHITE, BLACK colors = "WHITE", "BLACK"
+)
+
+func NewGraphVectorAL() *GraphAL {
+	return &GraphAL{
+		vectors: []*GraphVector{},
+	}
+}
+
+func (G *GraphAL) getVectorIndex(vector *GraphVector) int {
+
+	for index, val := range G.vectors {
+		if val.key == vector.key {
+			return index
+		}
+	}
+	return -1
+}
+
+func (G *GraphAL) addToVectors(vector *GraphVector) int {
+	if vectorIFrom := G.getVectorIndex(vector); vectorIFrom > -1 {
+		return vectorIFrom
+	} else {
+
+		G.vectors = append(G.vectors, vector)
+		vector.index = G.size
+		G.size++
+		return len(G.vectors) - 1
+	}
+}
+
+func (G *GraphAL) Insert(vector *GraphVector) {
+	if vector == nil {
+		return
+	}
+	vector.edges = *linkedList.NewSentinelList() // clear
+
+	G.addToVectors(vector)
+
+}
+func (G *GraphAL) edgeUndirected(from *GraphVector, to *GraphVector) {
+	if from == nil || to == nil {
+		return
+	}
+	fromI := G.getVectorIndex(from)
+	toI := G.getVectorIndex(to)
+	if fromI < 0 || toI < 0 {
+		return
+	}
+	// already exist omit
+	if exist := G.vectors[fromI].edges.Find(to); exist > -1 {
+		return
+	}
+	if exist := G.vectors[toI].edges.Find(fromI); exist > -1 {
+		return
+	}
+
+	G.vectors[fromI].edges.PushBack(to)
+	G.vectors[toI].edges.PushBack(from)
+
+}
+
+func (G *GraphDirected) Edge(graph *GraphAL, from *GraphVector, to *GraphVector) {
+
+	if from == nil || to == nil {
+		return
+	}
+	fromI := from.index
+	toI := to.index
+
+	if fromI < 0 || toI < 0 {
+		return
+	}
+	// already exist omit
+	if exist := graph.vectors[fromI].edges.Find(to); exist > -1 {
+		return
+	}
+
+	graph.vectors[fromI].edges.PushBack(to)
+
+}
+
+func (G *GraphAL) Edge(from *GraphVector, to *GraphVector) {
+	if G.graphType == nil {
+		G.edgeUndirected(from, to)
+		return
+	}
+	G.graphType.Edge(G, from, to)
+}
+
+func (G *GraphAL) dfs(current *GraphVector, visited *[]bool, cb func(*GraphVector)) {
+	vectorIndex := current.index
+	if (*visited)[vectorIndex] {
+		return
+	}
+
+	(*visited)[vectorIndex] = true
+
+	edges := G.vectors[vectorIndex].edges
+	p := edges.FrontNode()
+
+	for p != nil && p.Val() != nil {
+		vector := p.Val().(*GraphVector)
+		if !(*visited)[vector.index] {
+			G.dfs(vector, visited, cb)
+		}
+		p = p.Next()
+	}
+	// process vector
+	cb(current)
+
+}
+
+func (G *GraphAL) dfsWithCallback(current *GraphVector, visited *[]bool, cbVectorEarly func(*GraphVector), cbVectorLate func(*GraphVector)) {
+	vectorIndex := current.index
+	if (*visited)[vectorIndex] {
+		return
+	}
+
+	(*visited)[vectorIndex] = true
+
+	edges := G.vectors[vectorIndex].edges
+	p := edges.FrontNode()
+
+	cbVectorEarly(current)
+	for p != nil && p.Val() != nil {
+		vector := p.Val().(*GraphVector)
+		if !(*visited)[vector.index] {
+			G.dfsWithCallback(vector, visited, cbVectorEarly, cbVectorLate)
+		}
+		p = p.Next()
+	}
+	// process vector
+	cbVectorLate(current)
+}
+
+func (G *GraphAL) Dfs(start *GraphVector, cb func(*GraphVector)) {
+	if G.size < 1 {
+		return
+	}
+	visited := make([]bool, len(G.vectors))
+
+	index := start.index
+	if index < 0 {
+		return
+	}
+
+	G.dfs(start, &visited, cb)
+
+}
+
+func (G *GraphAL) DfsWithCallback(start *GraphVector, cbVectorEarly func(a *GraphVector), cbVectorLate func(a *GraphVector), visited *[]bool) {
+	if visited == nil {
+		v := make([]bool, len(G.vectors))
+		visited = &v
+	}
+	index := start.index
+	if index < 0 {
+		return
+	}
+	G.dfsWithCallback(G.vectors[index], visited, cbVectorEarly, cbVectorLate)
+}
+
+func (G *GraphAL) DfsIterative(start *GraphVector) {
+	visited := make([]bool, G.size)
+
+	stack := []*GraphVector{start}
+	visited[start.index] = true
+	for len(stack) > 0 {
+		current := stack[len(stack)-1]
+		vector := current.edges.FrontNode()
+
+		for vector != nil && vector.Val() != nil {
+
+			vectorIndex := vector.Val().(*GraphVector).index
+			if !visited[vectorIndex] {
+				stack = append(stack, vector.Val().(*GraphVector))
+				visited[vectorIndex] = true
+				vector = G.vectors[vectorIndex].edges.FrontNode()
+			} else {
+				vector = vector.Next()
+			}
+		}
+		// the stack will perform like a recursive call
+		// process vector
+		stack = stack[:len(stack)-1]
+	}
+}
+
+func ProcessEdges(start *GraphVector, end *GraphVector) {
+	fmt.Println(start, end)
+}
+
+func (G *GraphAL) BFS(start *GraphVector, cbEdges func(*GraphVector, *GraphVector) bool) {
+	if G.size < 1 {
+		return
+	}
+
+	queue := []*GraphVector{start}
+	visited := make([]bool, G.size)
+
+	for len(queue) > 0 {
+		vector := queue[0]
+		vectorI := vector.index
+		queue = queue[1:]
+		current := vector.edges.FrontNode()
+		visited[vectorI] = true
+		// process vector
+		for current != nil && current.Val() != nil {
+			currentI := current.Val().(*GraphVector).index
+
+			if !visited[currentI] && cbEdges(vector, current.Val().(*GraphVector)) {
+				queue = append(queue, current.Val().(*GraphVector))
+				visited[currentI] = true
+			}
+			current = current.Next()
+		}
+
+	}
+}
+
+func getOpositeColor(a colors) colors {
+	if a == WHITE {
+		return BLACK
+	}
+	return WHITE
+}
+
+func isValidColoring(a int, b int, colors *[]colors) (bool, error) {
+	if (*colors)[a] == (*colors)[b] {
+		return false, errors.New("SAME COLOR")
+	}
+	if (*colors)[b] == "" {
+		(*colors)[b] = getOpositeColor((*colors)[a])
+	}
+	return true, nil
+}
+
+func (G *GraphAL) IsBipartite() bool {
+	if G.size < 1 {
+		return true
+	}
+	bipartite := true
+	visited := make([]bool, G.size)
+	colors := make([]colors, G.size)
+	start := G.vectors[0]
+	for _, vector := range G.vectors {
+		if !visited[vector.index] && bipartite {
+
+			colors[vector.index] = WHITE // default if the vector has not been visited
+			G.BFS(start, func(a *GraphVector, b *GraphVector) bool {
+				visited[a.index] = true
+				visited[b.index] = true
+				if _, err := isValidColoring(a.index, b.index, &colors); err != nil {
+					bipartite = false
+				}
+				return true
+			})
+		}
+	}
+
+	return bipartite
+}
+
+func validParent(a *GraphVector, b *GraphVector, parent *[]*GraphVector) bool {
+
+	if (*parent)[b.index] == nil {
+		(*parent)[b.index] = a
+		return true
+	}
+	if (*parent)[a.index] == b {
+		return true
+	}
+
+	return false
+}
+
+func (G *GraphAL) TimesDfs() []time {
+	if G.size < 1 {
+		return nil
+	}
+	times := make([]time, G.size)
+	visited := make([]bool, G.size)
+	counter := 1
+	for _, vector := range G.vectors {
+
+		if !visited[vector.index] {
+			G.DfsWithCallback(vector, func(a *GraphVector) {
+				times[a.index].start = counter
+				counter++
+			}, func(a *GraphVector) {
+				times[a.index].end = counter
+				counter++
+			}, &visited)
+		}
+	}
+	return times
+}
+
+func (G *GraphAL) TimesDfsVectors() []*GraphVector {
+	if G.size < 1 {
+		return nil
+	}
+	vectors := []*GraphVector{}
+	visited := make([]bool, G.size)
+
+	for _, vector := range G.vectors {
+
+		if !visited[vector.index] {
+			G.DfsWithCallback(vector, func(_ *GraphVector) {
+			}, func(a *GraphVector) {
+				vectors = append(vectors, a)
+			}, &visited)
+		}
+	}
+	return vectors
+}
+
+func (G *GraphAL) HasCycle() bool {
+	if G.size < 1 {
+		return false
+	}
+	parent := make([]*GraphVector, G.size)
+	visited := make([]bool, G.size)
+	cycle := false
+	for _, vector := range G.vectors {
+		if !visited[vector.index] {
+			parent[vector.index] = vector
+			G.BFS(vector, func(gv1, gv2 *GraphVector) bool {
+				visited[gv1.index] = true
+				if !validParent(gv1, gv2, &parent) {
+					cycle = true
+				}
+				return true
+			})
+		}
+	}
+	return cycle
+}
+
+func (G *GraphAL) Size() int {
+	return G.size
+}
+
+func (G *GraphAL) GraphType(t GraphTypeInterface) {
+	G.graphType = t
+}
+
+func (G *GraphAL) Reverse() {
+	if G.graphType == nil {
+		return
+	}
+	G.graphType.Reverse(G)
+}
+
+```
+
+// connected.go
+
+```go
+package graphs
+
+func (G *GraphAL) reverseEdges(a, b *GraphVector) {
+	G.Edge(b, a)
+
+	a.edges.PopFront() // remove the connection
+}
+
+func (G *GraphAL) validParent(parents [][]*GraphVector, a, b *GraphVector) bool {
+	for _, val := range parents[a.index] {
+		if val == b {
+			return false
+		}
+	}
+	return true
+}
+
+func (GD *GraphDirected) Reverse(G *GraphAL) {
+
+	if G.size < 1 {
+		return
+	}
+	visited := make([]bool, G.size)
+	parents := make([][]*GraphVector, G.size)
+
+	for _, vector := range G.vectors {
+		if !visited[vector.index] {
+			parents[vector.index] = append(parents[vector.index], vector)
+			G.BFS(vector, func(parent, currentV *GraphVector) bool {
+				if G.validParent(parents, parent, currentV) {
+					parents[currentV.index] = append(parents[currentV.index], parent) // we update the parent to not re-reverse
+					G.reverseEdges(parent, currentV)
+
+					return true
+				}
+				// to save some time we return true if the neighbor is invalid and we this we same time omiting that vector
+				return false
+			})
+
+		}
+	}
+}
+
+func (G *GraphAL) StronglyConnectedComponents() int {
+
+	G.Reverse()
+	postorderVectors := G.TimesDfsVectors()
+	G.Reverse()
+	counter := 0
+
+	visited := make([]bool, G.size)
+	for i := G.size - 1; i >= 0; i-- {
+		vector := postorderVectors[i]
+		if !visited[vector.index] {
+
+			vector.edges.FrontNode().Display()
+			G.dfsWithCallback(vector, &visited, func(gv *GraphVector) {}, func(gv *GraphVector) {
+
+			})
+			counter++
+		}
+	}
+	return counter
+}
+
+```
+
+//interface.go
+
+```go
+package graphs
+
+import (
+	linkedList "goudemy/linkedList/lib"
+)
+
+type GraphVector struct {
+	val   interface{}
+	key   int
+	edges linkedList.SentinelList
+	index int
+}
+
+type GraphAL struct {
+	vectors   []*GraphVector
+	size      int
+	graphType GraphTypeInterface
+}
+
+type GraphAM struct {
+	edges   [][]int
+	vectors []*GraphVector
+	size    int
+}
+type GraphTypeInterface interface {
+	// new vector connected to a Vector, returns the new Vector
+	Edge(*GraphAL, *GraphVector, *GraphVector)
+	Reverse(*GraphAL)
+}
+
+type GraphDirected struct {
+}
+type GraphInterface interface {
+	Insert(*GraphVector)
+	Size() int
+	Edge(*GraphVector, *GraphVector)
+	Dfs(*GraphVector, func(*GraphVector))
+	DfsIterative(*GraphVector)
+	BFS(*GraphVector, func(*GraphVector, *GraphVector) bool)
+	IsBipartite() bool
+	TimesDfs() []time
+	HasCycle() bool
+	GraphType(GraphTypeInterface)
+	StronglyConnectedComponents() int
+	Reverse()
+}
+
+type Graph struct {
+	size      int
+	GraphType GraphTypeInterface
+}
+
+func NewVector(key int, val interface{}) *GraphVector {
+	return &GraphVector{key: key, val: val}
+}
+
+func (G *Graph) Size() int {
+	return G.size
+}
+
+```

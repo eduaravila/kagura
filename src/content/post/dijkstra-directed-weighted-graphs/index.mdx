@@ -1,0 +1,109 @@
+---
+title: "Graphs - Dijkstra Algorithm - Golang"
+publishDate: "23 Feb 2022"
+description: "Dijkstra Algorithm - Golang - Graphs - Algorithms - Data Structures"
+tags: ["algorithms", "data structures", "graphs", "dijkstra", "golang"]
+draft: false
+---
+
+
+## Dijkstra
+
+> we need to get the path from vector a to vector b that ends up summing up the minimum from it's edges
+
+**only for weighted directed graphs with positive weights**
+
+with adjacency list we need
+`visited []bool
+weights []*Edge
+path []*Edge`
+
+- start all the weights to be infinite, `&Edge{vector: vector, weight: Inf}`
+- first we set the weight of the "a" vector to be 0 because we know that we need 0 steps to get from a to a
+- then we need to get the min weight from the weights arr, in the first step we'll get the "a" vector because it's the only one with 0 and all of the others are inf we call this **u**
+	- here we mark the resulting vector as `visited[vector] = true``, this is to be sure we don't get in an infinite loop
+- we iterate until **u** != nil
+	- add **u** to the path `path = append(path, u)
+	- `v := u.edges.front()` will be equal to the first edge in u
+		- iterate until `v != nil``
+			- try to **relax** the edges and weights, this means, compare the u + edge weights with v weight, or   `if weights[v] > weights[u]+ edge.weight` then update `weights[v]= weights[u]+ edge.weight`, this will help us in the next iteration
+	- again we get the next min, in this case will be different because we updated the weights of the edges from **u**
+
+![dijkstra](//images.ctfassets.net/tt922ph7a4na/JagR6igvSilPI49axPuBd/d3b0b458001ecd2f087366434dc33774/dijkstra.jpg)
+
+### code
+
+```go
+
+func (G *GraphAL) EdgeWeighted(from *GraphVector, to *Edge) {
+
+	if from == nil || to == nil {
+		return
+	}
+	fromI := from.index
+	toI := to.vector.index
+
+	if fromI < 0 || toI < 0 {
+		return
+	}
+	// already exist omit
+	if exist := G.vectors[fromI].edges.Find(to); exist > -1 {
+		return
+	}
+
+	G.vectors[fromI].edges.PushBack(to)
+
+}
+
+func (GW *GraphAL) extractMinimumWeight(visited *[]bool, weights *[]*Edge) *Edge {
+	var min *Edge
+
+	for _, edge := range *weights {
+		if (min == nil || edge.weight < min.weight) && !(*visited)[edge.vector.index] {
+			min = edge
+		}
+	}
+	(*visited)[min.vector.index] = true
+	return min
+}
+
+func (G *GraphAL) initWeightQueue() []*Edge {
+	queue := make([]*Edge, G.size)
+	for _, vector := range G.vectors {
+		queue[vector.index] = &Edge{vector: vector, weight: int(^uint(0) >> 1)}
+	}
+	return queue
+}
+
+func (GW *GraphAL) relax(weights *[]*Edge, u *GraphVector, v *Edge) {
+	newWeight := (*weights)[u.index].weight + v.weight
+	if (*weights)[v.vector.index].weight > newWeight {
+		(*weights)[v.vector.index].weight = newWeight
+		v.weight = newWeight
+	}
+}
+
+func (G *GraphAL) Dijkstra(a, b *GraphVector) []*Edge {
+	weights := G.initWeightQueue()
+	visited := make([]bool, G.size)
+	path := []*Edge{}
+	weights[a.index].weight = 0
+	u := G.extractMinimumWeight(&visited, &weights)
+	for u != nil {
+		if u.vector.index == b.index {
+			path = append(path, u)
+			break
+		}
+		v := u.vector.edges.FrontNode()
+		path = append(path, u)
+		for v != nil && v.Val() != nil {
+			G.relax(&weights, u.vector, v.Val().(*Edge))
+			v = v.Next()
+		}
+		u = G.extractMinimumWeight(&visited, &weights)
+	}
+
+	return path
+}
+
+```
