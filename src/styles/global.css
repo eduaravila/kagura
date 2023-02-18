@@ -29,6 +29,11 @@
 	html body {
 		@apply w-full mx-auto flex h-full md:max-w-4xl flex-col bg-bgColor sm:px-10 sm:pt-10 px-5 pt-10 font-mono text-sm font-normal text-textColor antialiased;
 	}
+
+  .ml-form-embedWrapper{
+    @apply w-full max-w-full !important;
+  }
+
 }
 @tailwind components;
 @tailwind utilities;
