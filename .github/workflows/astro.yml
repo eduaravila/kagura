@@ -15,7 +15,8 @@ on:
 env:
   BUILD_PATH: "." # default value when not using subfolders
   # BUILD_PATH: subfolder
-
+  PUBLIC_GOPLAYGROUND_API: ${{secrets.PUBLIC_GOPLAYGROUND_API}}
+  PUBLIC_GOPLAYGROUND_API2: ${{vars.PUBLIC_GOPLAYGROUND_API}}
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
@@ -34,8 +35,9 @@ jobs:
     - name: Make envfile
       uses: SpicyPizza/create-envfile@v1.3
       with:
-        envkey_PUBLIC_GOPLAYGROUND_API: ${{secrets.PUBLIC_GOPLAYGROUND_API}}
-        envkey_PUBLIC_GOPLAYGROUND_API2: ${{vars.PUBLIC_GOPLAYGROUND_API}}
+        envkey_DEBUG: false
+        envkey_SOME_API_KEY: "123456abcdef"
+        envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
   build:
     name: Build
@@ -74,6 +76,7 @@ jobs:
         working-directory: ${{ env.BUILD_PATH }}
       - name: Build with Astro
         run: |
+          echo "PUBLIC_GOPLAYGROUND_API: $PUBLIC_GOPLAYGROUND_API" >> .env
           ${{ steps.detect-package-manager.outputs.runner }} astro build \
             --site "${{ steps.pages.outputs.origin }}" \
             --base "${{ steps.pages.outputs.base_path }}"
