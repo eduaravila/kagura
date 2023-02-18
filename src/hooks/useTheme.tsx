@@ -8,8 +8,9 @@ const useTheme = () => {
 		if (typeof window === "undefined" || !window.matchMedia) {
 			return "light";
 		}
+
 		return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-	}, [window]);
+	}, []);
 
 	const [theme] = useState<"light" | "dark" | "auto">(
 		getThemePreference() as "light" | "dark" | "auto"
