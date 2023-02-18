@@ -7,6 +7,7 @@ const siteMeta = {
 	githubUrl: "https://github.com/eduaravila",
 	themeColorLight: "#fafafa",
 	themeColorDark: "#1d1f21",
+	ga: "G-PJDXYJ5H7C",
 };
 
 export default siteMeta;

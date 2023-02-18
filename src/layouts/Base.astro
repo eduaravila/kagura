@@ -4,8 +4,9 @@ import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import SkipLink from "@/components/SkipLink";
 import type { SiteMeta } from "@/data/siteMeta";
-
+// https://astro.build/config
 import siteConfig from "@/site-config";
+import { GoogleAnalytics } from "@astrolib/analytics";
 
 interface Props {
 	meta: SiteMeta;
@@ -17,15 +18,15 @@ const {
 ---
 
 <html lang={siteConfig.lang}>
-	<script async defer src={"/cusdis.es.js"}></script>
-
+	<script type="text/partytown" async defer src={"/cusdis.es.js"}></script>
+  <GoogleAnalytics id={siteConfig.ga} partytown={true} />
 	<BaseHead title={title} description={description} ogImage={ogImage} articleDate={articleDate} />
 	<script define:vars={{ siteConfig }}>
 		const root = document.documentElement;
 		const colorThemeMetaTag = document.querySelector("meta[name='theme-color']");
 
 		// get user preference of dark mode, 1st local storage, 2nd browser
-		function getThemePreference() {
+		function getThem ePreference() {
 			if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
 				return localStorage.getItem("theme");
 			}
