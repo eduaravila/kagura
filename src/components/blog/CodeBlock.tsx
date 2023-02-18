@@ -64,7 +64,7 @@ export default function ({ defaultCode }: props) {
 				<pre className="border-t-2 border-dotted bg-bgColor py-2 font-mono text-lg">{result}</pre>
 			)}
 			<p>{JSON.stringify(import.meta.env)}</p>
-			<p>{JSON.stringify(JSON.stringify(process.env))}</p>
+			<p>{JSON.stringify(process.env)}</p>
 		</div>
 	);
 }
