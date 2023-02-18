@@ -83,9 +83,6 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-      env:
-        PUBLIC_GOPLAYGROUND_API: ${{secrets.PUBLIC_GOPLAYGROUND_API}}
-        PUBLIC_GOPLAYGROUND_API2: ${{vars.PUBLIC_GOPLAYGROUND_API}}
     needs: build
     runs-on: ubuntu-latest
     name: Deploy
