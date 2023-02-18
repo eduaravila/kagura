@@ -11,7 +11,6 @@ import react from "@astrojs/react";
 // https://astro.build/config
 export default defineConfig({
 	site: "https://eduaravila.github.io/",
-	base: "/kagura",
 	markdown: {
 		shikiConfig: {
 			theme: "nord",
