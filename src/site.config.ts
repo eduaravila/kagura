@@ -10,4 +10,6 @@ const siteMeta = {
 	ga: "G-PJDXYJ5H7C",
 };
 
+export const MAX_POSTS = 10;
+
 export default siteMeta;

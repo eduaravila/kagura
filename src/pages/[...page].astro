@@ -1,0 +1,65 @@
+---
+import PageLayout from "@/layouts/Base";
+import Pages from "@/layouts/Pages";
+import { MAX_POSTS } from "@/site-config";
+import { sortMDByDate } from "@/utils";
+import type { GetStaticPathsOptions,Page } from "astro";
+import type { CollectionEntry } from "astro:content";
+import { getCollection } from "astro:content";
+import { fallbackLanguage } from "i18n";
+import { getLocaleFromPostId,getNonDraftPosts,getUniqueTags } from "src/utils/post";
+
+export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
+
+	let allPosts = await getCollection("post");
+	allPosts = getNonDraftPosts(allPosts);
+
+	const uniqueTags = getUniqueTags(allPosts);
+	const allPostsByDate = sortMDByDate(allPosts);
+
+	const fallbackLanguagePost = allPostsByDate.filter(
+		(p) => getLocaleFromPostId(p.id) === fallbackLanguage
+	);
+
+	const postFallback = paginate(fallbackLanguagePost, {
+		props: { uniqueTags },
+		params: { locale: undefined },
+		pageSize: MAX_POSTS,
+	});
+
+	return [postFallback];
+}
+
+interface Props {
+	page: Page<CollectionEntry<"post">>;
+	uniqueTags: string[];
+}
+
+const { page, uniqueTags,locale } = Astro.props;
+
+
+
+const meta = {
+	title: "Posts",
+	description: "A collection of posts in english",
+};
+
+const paginationProps = {
+	...(page.url.prev && {
+		prevUrl: {
+			url: page.url.prev,
+			text: `← Previous Posts`,
+		},
+	}),
+	...(page.url.next && {
+		nextUrl: {
+			url: page.url.next,
+			text: `Next Posts →`,
+		},
+	}),
+};
+
+---
+<PageLayout meta={{  ...meta,title: "Home" }}>
+	<Pages page={page} uniqueTags={uniqueTags} />
+</PageLayout>

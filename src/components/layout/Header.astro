@@ -10,10 +10,6 @@ const menuLinks = [
 		path: "/",
 	},
 	{
-		title: "all posts",
-		path: "/posts",
-	},
-	{
 		title: "tags",
 		path: "/tags",
 	},
@@ -47,7 +43,7 @@ const menuLinks = [
 			class="flex flex-row items-center grayscale hover:filter-none sm:relative"
 			aria-current={url.pathname === "/" ? "page" : false}
 		>
-			<img src={logo} class="h-12 w-10" />
+			<img src={logo} class="h-12 w-10" alt="tamagoyaki logo" />
 			<p class="text-xl font-bold sm:text-2xl">tamagoyaki</p>
 		</a>
 		<nav
