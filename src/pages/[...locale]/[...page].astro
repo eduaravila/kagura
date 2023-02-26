@@ -21,14 +21,14 @@ export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
 		const posts = getNonDraftPosts(allPostsByDate).filter(
 			(p) => getLocaleFromPostId(p.id) === locale
 		);
-		return paginate(posts, {
+    return posts.length > 0 ? paginate(posts, {
 			props: { uniqueTags },
 			params: {
 				locale,
 			},
 			pageSize: MAX_POSTS,
-		});
-	});
+		}) : null;
+	}).filter(p => p !== null)
 
 	const fallbackLanguagePost = allPostsByDate.filter(
 		(p) => getLocaleFromPostId(p.id) === fallbackLanguage

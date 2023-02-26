@@ -12,19 +12,21 @@ export async function getStaticPaths(): Promise<GetStaticPathsResult> {
 
   const allPosts = await getCollection("post");
 
-  const postTagsPerLocale = Object.keys(supportedLanguages).map((locale) => {
-    const posts = allPosts.filter((p) => getLocaleFromPostId(p.id) === locale);
+  const postTagsPerLocale = Object.keys(supportedLanguages)
+  .map((locale) => {
+    const posts = allPosts.filter((p) => getLocaleFromPostId(p.id) === locale && locale !== fallbackLanguage);
     const tags = getUniqueTagsWithCount(posts);
-    return {
+    return {locale,tags}
+  })
+  .filter(p => Object.keys(p.tags).length > 0)
+  .map(({locale,tags}) => ({
       params: {
         locale,
       },
       props:{
         allTags: tags
       }
-    }
-  });
-
+    }));
   const fallbackLanguagePost = allPosts.filter(
 		(p) => getLocaleFromPostId(p.id) === fallbackLanguage
 	);

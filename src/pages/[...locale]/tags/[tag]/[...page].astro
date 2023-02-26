@@ -15,9 +15,10 @@ export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
 	const uniqueTags = getUniqueTags(allPostsByDate);
 
   const postPerLocale = Object.keys(supportedLanguages).map((locale) => {
-		const posts = getNonDraftPosts(allPostsByDate).filter(
-			(p) => getLocaleFromPostId(p.id) === locale
-		);
+		return {posts: getNonDraftPosts(allPostsByDate).filter(
+			(p) => getLocaleFromPostId(p.id) === locale && locale !== fallbackLanguage
+		), locale}
+	}).filter( (p) => p.posts.length > 0).map(({posts,locale})=>{
     return uniqueTags.map((tag) => {
       const filterPosts = posts.filter((post) => post.data.tags?.includes(tag));
       return paginate(filterPosts, {
@@ -25,7 +26,7 @@ export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
         pageSize: 10,
       });
     })
-	}).flat();
+  }).flat()
 
 
   const fallbackLanguagePost = allPostsByDate.filter(
