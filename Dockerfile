@@ -9,6 +9,8 @@ COPY .yarn /usr/src/app/.yarn
 # Install app dependencies
 COPY .yarnrc.yml /usr/src/app/.yarnrc.yml
 COPY package*.json ./
+COPY yarn.lock ./
+
 RUN yarn install
 
 COPY . .
