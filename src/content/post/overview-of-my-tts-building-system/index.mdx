@@ -1,0 +1,128 @@
+---
+title: "Take Your Stream to the Next Level: A Comprehensive Overview of My TTS Building System"
+description: "Learn how to build a TTS system from scratch, and how to use our TTS building system to build your own TTS system."
+publishDate: "10 Apr 2023"
+tags: ["system design", "event modeling", "event sourcing", "CQRS", "domain-driven design", "DDD", "microservices", "distributed systems", "distributed architecture"]
+draft: false
+---
+
+
+import PictureWithLink from '../../../components/blog/PictureWithLink.jsx';
+
+TLDR: Learn how to build a TTS system from scratch, and how to use our TTS building system to build your own TTS system.
+
+
+<PictureWithLink
+  src={"/svg/take-your-stream-to-the-next-level-a-comprehensive-overview-of-our-TTS-building-system/momo-event-modeling.drawio.svg"}
+/>
+
+<br/>
+
+# Introduction
+  As a fan of Twitch streamers, I was struck by the sense of community that arises when people with shared interests connect in this way. However, I soon realized that for streamers, keeping in touch with their audiences can be challenging, especially as their viewership grows. This problem prompted me to look into ways to enhance the streaming experience for both streamers and viewers.
+
+  One day, while watching Forsen's channel, I was fascinated by the hilarious messages he was receiving from his viewers. I wondered how he was able to keep up with them all and keep his audience engaged. Through some research, I discovered that he was using a TTS system, which stands for Text-To-Speech. This system reads out loud the messages that viewers send to the streamer, making it easier for the streamer to stay connected with their audience.
+
+  Inspired by this, I set out to build a TTS system that streamers could use to keep in touch with their viewers and make their streams more entertaining. The result is a system that streamers can use to enhance their connections with their audiences and create a more engaging streaming experience for everyone.
+
+# Overview of the TTS System
+
+  There are numerous TTS systems available to streamers, including TTS Monster, Solrock, and TTS Reader, all serving the same purpose of helping streamers stay connected with their audience by reading messages sent by viewers out loud. However, I wanted to build a TTS system with a broader scope that not only supports Twitch but also other platforms such as YouTube and Facebook.
+
+  To make my TTS system stand out, I incorporated the best features from other TTS systems, such as custom voice messages and sound effects, while also adding new features like background music and more sound effects.
+
+  One of the unique features of my TTS system is speech-to-event, allowing streamers to trigger events like sound effects or background music with their own voice. This feature makes it easy for streamers to engage with their audience and keep their stream entertaining. For example, a simple phrase like "thanks for the sub" could trigger a sound effect, while saying "play music" could start playing background music.
+
+  My overall goal is to build a TTS system that enhances the connection between streamers and their audience and creates a more engaging streaming experience regardless of the platform they use.
+
+# Benefits
+  - keep in touch with your audience
+  - make your stream more entertaining
+  - make your stream more interactive
+  - make your stream more engaging
+
+# Event Modeling
+  ![momoEventModeling](/svg/take-your-stream-to-the-next-level-a-comprehensive-overview-of-our-TTS-building-system/momo-event-modeling.drawio.svg)
+
+## Auth (Golang)
+  is a critical component of any TTS system, and our auth service handles user authorization and authentication. We support OAuth providers like Twitch, YouTube, Facebook, and others.
+
+### features:
+  - Authorization
+  - Authentication
+  - Validation (JWT token)
+
+## Sniffer (listener service) (Golang)
+  is responsible for listening to chat messages from the streaming platform, and it works with the platform's API to receive and process these messages.
+
+### features:
+  - listen to the chat messages
+  - listen to donations
+  - listen to subscriptions
+  - listen to follows
+  - listen to bits (twitch)
+
+## Configuration (Golang)
+  service manages the TTS system's configuration and offers features like configuring events for the listener, as well as banning words, effects, and other settings.
+
+### features:
+  - configurarion of events (listener)
+  - ban words, effects, etc.
+  - ban conbinations of any of the above.
+
+## message parser (Golang)
+  The message parser service is responsible for parsing chat messages and extracting events from them, as well as any relevant parameters.
+
+### features:
+  - filter the messages
+  - extract the events from the messages
+  - extract the parameters from the messages
+
+## Audio generetor (Python)
+  Finally, the audio generator service is responsible for generating audio files for events, adding sound effects, background music, custom voice messages, and more.
+
+### Features:
+  - generate the audio files with all the parameters specified in the message
+  - add sound effects
+  - add background music
+  - add custom voice messages
+
+## Technologies I Plan to Use
+
+  This is a list of technilogies i plan to use without any order in specific:
+
+- Golang
+- Python
+- Docker
+- [Dokku](https://dokku.com/docs/)
+- Digital Ocean
+- Postgres
+- gRPC
+- [Uberduck](https://uberduck.ai/) (for the voice messages)
+
+After the beta release, if everything goes well, I plan to shift to our own voice messages service.
+
+## architecture
+
+  To ensure efficient internal communication, the app will be divided into microservices, with each one assigned a specific task. These microservices will use gRPC for communication, while REST API will be used for external communication.
+
+  In line with the clean architecture approach, each app will be deployed in a docker container and will have its own database. Postgres has been chosen as the database of choice. Deployment management will be done using Dokku. The project structure will follow a clean architecture structure, as detailed in this [link](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html).
+
+## Pricing
+
+  The goal is to maintain this application completely open source and free for users. Therefore, it is crucial to make wise decisions about the architecture and hosting.
+
+## Conclusion
+
+  This is just the start of this journey, and I'm excited to see where it takes me. I hope you enjoyed this post and found it useful. If you have any questions or comments, please feel free to leave them below.
+
+---
+
+## source code
+
+  while this is not finished by any means you can check the code here: [momo-tts](https://github.com/eduaravila/momo)
+
+References:
+  - [software dark ages](https://threedots.tech/post/software-dark-ages/)
+  - [event modeling](https://eventmodeling.org/posts/what-is-event-modeling/)
+  - [ai tts donations](https://github.com/mmattDonk/AI-TTS-Donations)
