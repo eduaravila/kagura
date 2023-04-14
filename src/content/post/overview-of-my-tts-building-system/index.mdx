@@ -1,6 +1,6 @@
 ---
 title: "Take Your Stream to the Next Level: A Comprehensive Overview of My TTS Building System"
-description: "Learn how to build a TTS system from scratch, and how to use our TTS building system to build your own TTS system."
+description: "Discover the secrets of constructing a TTS system from the ground up, and unleash your creativity by utilizing our TTS building system to design your very own TTS solution."
 publishDate: "10 Apr 2023"
 tags: ["system design", "event modeling", "event sourcing", "CQRS", "domain-driven design", "DDD", "microservices", "distributed systems", "distributed architecture"]
 draft: false
@@ -9,8 +9,7 @@ draft: false
 
 import PictureWithLink from '../../../components/blog/PictureWithLink.jsx';
 
-TLDR: Learn how to build a TTS system from scratch, and how to use our TTS building system to build your own TTS system.
-
+TLDR: Discover the secrets of constructing a TTS system from the ground up, and unleash your creativity by utilizing our TTS building system to design your very own TTS solution.
 
 <PictureWithLink
   src={"/svg/take-your-stream-to-the-next-level-a-comprehensive-overview-of-our-TTS-building-system/momo-event-modeling.drawio.svg"}
@@ -31,7 +30,7 @@ TLDR: Learn how to build a TTS system from scratch, and how to use our TTS build
 
   To make my TTS system stand out, I incorporated the best features from other TTS systems, such as custom voice messages and sound effects, while also adding new features like background music and more sound effects.
 
-  One of the unique features of my TTS system is speech-to-event, allowing streamers to trigger events like sound effects or background music with their own voice. This feature makes it easy for streamers to engage with their audience and keep their stream entertaining. For example, a simple phrase like "thanks for the sub" could trigger a sound effect, while saying "play music" could start playing background music.
+  One of the unique features of the app will be speech-to-event, allowing streamers to trigger events like sound effects or background music with their voice. This feature makes it easy for streamers to engage with their audience and keep their stream entertaining. For example, a simple phrase like "thanks for the sub" could trigger a sound effect, while saying "play music" could start playing background music.
 
   My overall goal is to build a TTS system that enhances the connection between streamers and their audience and creates a more engaging streaming experience regardless of the platform they use.
 
@@ -47,7 +46,7 @@ TLDR: Learn how to build a TTS system from scratch, and how to use our TTS build
 ## Auth (Golang)
   is a critical component of any TTS system, and our auth service handles user authorization and authentication. We support OAuth providers like Twitch, YouTube, Facebook, and others.
 
-### features:
+### Features:
   - Authorization
   - Authentication
   - Validation (JWT token)
@@ -55,7 +54,7 @@ TLDR: Learn how to build a TTS system from scratch, and how to use our TTS build
 ## Sniffer (listener service) (Golang)
   is responsible for listening to chat messages from the streaming platform, and it works with the platform's API to receive and process these messages.
 
-### features:
+### Features:
   - listen to the chat messages
   - listen to donations
   - listen to subscriptions
@@ -65,20 +64,20 @@ TLDR: Learn how to build a TTS system from scratch, and how to use our TTS build
 ## Configuration (Golang)
   service manages the TTS system's configuration and offers features like configuring events for the listener, as well as banning words, effects, and other settings.
 
-### features:
-  - configurarion of events (listener)
+### Features:
+  - configuration of events (listener)
   - ban words, effects, etc.
-  - ban conbinations of any of the above.
+  - ban combinations of any of the above.
 
-## message parser (Golang)
+## Message parser (Golang)
   The message parser service is responsible for parsing chat messages and extracting events from them, as well as any relevant parameters.
 
-### features:
+### Features:
   - filter the messages
   - extract the events from the messages
   - extract the parameters from the messages
 
-## Audio generetor (Python)
+## Audio generator (Python)
   Finally, the audio generator service is responsible for generating audio files for events, adding sound effects, background music, custom voice messages, and more.
 
 ### Features:
@@ -89,7 +88,7 @@ TLDR: Learn how to build a TTS system from scratch, and how to use our TTS build
 
 ## Technologies I Plan to Use
 
-  This is a list of technilogies i plan to use without any order in specific:
+  This is a list of technologies I plan to use without any order in specific:
 
 - Golang
 - Python
@@ -100,13 +99,13 @@ TLDR: Learn how to build a TTS system from scratch, and how to use our TTS build
 - gRPC
 - [Uberduck](https://uberduck.ai/) (for the voice messages)
 
-After the beta release, if everything goes well, I plan to shift to our own voice messages service.
+After the beta release, if everything goes well, I plan to shift to our own voice message service.
 
-## architecture
+## Architecture
 
   To ensure efficient internal communication, the app will be divided into microservices, with each one assigned a specific task. These microservices will use gRPC for communication, while REST API will be used for external communication.
 
-  In line with the clean architecture approach, each app will be deployed in a docker container and will have its own database. Postgres has been chosen as the database of choice. Deployment management will be done using Dokku. The project structure will follow a clean architecture structure, as detailed in this [link](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html).
+  In line with the clean architecture approach, each app will be deployed in a docker container and will have its database. Postgres has been chosen as the database of choice. Deployment management will be done using Dokku. The project structure will follow a clean architecture structure, as detailed in this [link](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html).
 
 ## Pricing
 
@@ -118,7 +117,7 @@ After the beta release, if everything goes well, I plan to shift to our own voic
 
 ---
 
-## source code
+## Source code
 
   while this is not finished by any means you can check the code here: [momo-tts](https://github.com/eduaravila/momo)
 

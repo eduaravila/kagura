@@ -11,11 +11,9 @@ export default function PictureWithLink({ src, widths, sizes, alt }: Props) {
 	const altProp = alt ? alt : "Picture";
 
 	return (
-		<>
+		<div className="mb-5">
 			<img src={src} alt={altProp} />
-			<a href={src} className="mb-10">
-				high res version
-			</a>
-		</>
+			<a href={src}>high res version</a>
+		</div>
 	);
 }

@@ -1,0 +1,126 @@
+---
+title: "Lleva tu stream al siguiente nivel: una visión general completa de nuestro sistema de construcción de TTS"
+description: "Aprende cómo construir un sistema TTS desde cero y cómo usar nuestro sistema de construcción de TTS para construir tu propio sistema TTS."
+publishDate: "10 Apr 2023"
+tags: ["system design", "event modeling", "event sourcing", "CQRS", "domain-driven design", "DDD", "microservices", "distributed systems", "distributed architecture"]
+draft: false
+---
+
+import PictureWithLink from '../../../components/blog/PictureWithLink.jsx';
+
+TL;DR: Aprende cómo construir un sistema TTS desde cero y cómo usar nuestro sistema de construcción de TTS para construir tu propio sistema TTS.
+
+<PictureWithLink
+  src={"/svg/take-your-stream-to-the-next-level-a-comprehensive-overview-of-our-TTS-building-system/momo-event-modeling.drawio.svg"}
+/>
+
+<br/>
+
+# Introduccion
+  Siendo fan de multiples streamers en Twitch, me sorprendió el sentido de comunidad que surge cuando las personas con intereses compartidos se conectan de esta manera. Sin embargo, pronto me di cuenta de que para los streamers, mantenerse en contacto con sus audiencias puede ser complicado, especialmente a medida que su audiencia crece. Este problema me animó a buscar formas de mejorar la experiencia de transmisión para streamers y espectadores.
+
+  Un dia, mientra disfrutaba del canal de Forsen, me fascinaron los mensajes hilarantes que recibía de sus espectadores. Me pregunté cómo podía mantenerse al día con todos ellos y mantener a su audiencia entretenida. A través de algunas investigaciones, descubrí que estaba usando un sistema TTS, que significa Text-To-Speech. Este sistema lee en voz alta los mensajes que los espectadores envían al streamer, lo que facilita que el streamer se mantenga conectado con su audiencia.
+
+  Esto me inpiro, y me dispuse a construir un sistema TTS que los streamers pudieran usar para mantenerse en contacto con sus espectadores y hacer sus transmisiones más entretenidas. El resultado es un sistema que los streamers pueden usar para mejorar sus conexiones con sus audiencias y crear una experiencia de transmisión más entretenida para todos.
+
+
+# Vista en general de sistema TTS
+
+  Hoy en dia hay muchos sistemas TTS disponibles, Por ejemplo, Monster TTS, Solrock and TTS reader, todos sirviendo el mismo proposito de ayudar a los streamers a mantenerse conectados con su audiencia leyendo los mensajes enviados por los espectadores en voz alta. Sin embargo, quería construir un sistema TTS con un alcance más amplio que no solo soportara Twitch, sino también otras plataformas como YouTube y Facebook.
+
+  Para lograr que mi TTS se destaque, incorporé las mejores características de otros sistemas TTS, como mensajes de voz personalizados y efectos de sonido, mientras que también agregué nuevas características como música de fondo y más efectos de sonido.
+
+  Una de las características unicas de la plataforma incluiria "Speech to event" que permite a los streamers activar eventos como efectos de sonido o música de fondo con su propia voz. Esta caracteristica facilita que los streamers interactuen con su audiencia y mantengan su transmisión entretenida. Por ejemplo, una frase simple como "gracias por la suscripción" podría activar un efecto de sonido, mientras que decir "reproducir música" podría comenzar a reproducir música de fondo.
+
+  El objetivo en general es construir un sistema TTS que mejore la conexión entre los streamers y su audiencia y cree una experiencia de transmisión más entretenida, independientemente de la plataforma que usen.
+
+# Beneficios
+  - Mantenerse en contacto con su audiencia
+  - hacer el stream más entretenido
+  - hacer el stream más interactivo
+  - hacer el stream más atractivo
+
+
+# Modelado de eventos
+  ![momoEventModeling](/svg/take-your-stream-to-the-next-level-a-comprehensive-overview-of-our-TTS-building-system/momo-event-modeling.drawio.svg)
+
+## Auth (Golang)
+  Es un componente critico de cualquier sistema TTS, y nuestro servicio de autenticacion se encarga de la autorizacion y autenticacion de los usuarios. Soportamos proveedores de OAuth como Twitch, YouTube, Facebook y otros.
+
+### Caracteristicas:
+  - Autorizacion
+  - Autenticacion
+  - Validacion (JWT token)
+
+## Sniffer (Escucha eventos / hooks) (Golang)
+  Es responsable de escuchar los eventos de la plataforma de transmision, como suscripciones, donaciones, etc. y enviarlos al servicio de escucha.
+
+### Caracteristicas:
+  - escuchar los mensajes de chat
+  - escuchar las donaciones
+  - escuchar las suscripciones
+  - escuchar los seguidores
+  - escuchar los bits (twitch)
+
+## Configuracion (Golang)
+  Servicio que maneja la configuracion del sistema TTS y ofrece funciones como configurar eventos para el escuchador, así como palabras, efectos y otros ajustes prohibidos.
+
+### Caracteristicas:
+  - configurar eventos (escuchador)
+  - palabras prohibidas, efectos, etc.
+  - prohibir combinaciones de cualquiera de los anteriores.
+
+## Analizador de mansajes (Golang)
+  El servicio de analizador de mensajes es responsable de analizar los mensajes de chat y extraer eventos de ellos, así como cualquier parámetro relevante.
+
+### Caracteristicas:
+  - Filtrado de mensajes
+  - Extraer eventos de los mensajes
+  - Extraer parametros de los mensajes
+
+## Generador de audio (Python)
+  Finalmente, el servicio generador de audio es responsable de generar archivos de audio para eventos, agregando efectos de sonido, música de fondo, mensajes de voz personalizados y más.
+
+### Caracteristicas
+  - generar archivos de audio con todos los parametros especificados en el mensaje
+  - agregar efectos de sonido
+  - agregar musica de fondo
+  - agregar mensajes de voz personalizados
+
+## Tecnologias que planeo utilizar
+  Esta es una lista de tecnologias que planeo usar sin ningun orden en especifico:
+
+- Golang
+- Python
+- Docker
+- [Dokku](https://dokku.com/docs/)
+- Digital Ocean
+- Postgres
+- gRPC
+- [Uberduck](https://uberduck.ai/) (para generar los mensajes de voz) *temporal*
+
+*Despues del lanzamiento beta, si todo sale bien, planeo migrar a nuestro propio servicio de mensajes de voz.*
+
+
+## Arquitectura / estructura
+  Para asegurar una comunicacion interna eficiente, la aplicacion estara dividida en microservicios, con cada uno asignado una tarea especifica. Estos microservicios usaran gRPC para la comunicacion, mientras que la API REST se usara para la comunicacion externa.
+
+  En linea con el enfoque de arquitectura limpia, cada aplicacion se desplegara en un contenedor docker y tendra su propia base de datos. Postgres ha sido elegido como la base de datos de eleccion. El manejo de despliegue se realizara usando Dokku. La estructura del proyecto seguirá una estructura de arquitectura limpia, como se detalla en este [link](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html).
+
+
+## Precio
+  El objetivo es mantener esta aplicacion completamente de codigo abierto y gratuita para los usuarios. Por lo tanto, es crucial tomar decisiones sabias sobre la arquitectura y el alojamiento.
+
+## Conclusion
+  Este es solo el comienzo de este viaje, y estoy emocionado de ver a donde me lleva. Espero que haya disfrutado de esta publicacion y la haya encontrado util. Si tiene alguna pregunta o comentario, no dude en dejarlos a continuacion.
+
+---
+
+## Codigo fuente
+  Aunque aun no finalizado, puede revisar el codigo aqui: [momo-tts](https://github.com/eduaravila/momo)
+
+
+Referencias:
+  - [software dark ages](https://threedots.tech/post/software-dark-ages/)
+  - [event modeling](https://eventmodeling.org/posts/what-is-event-modeling/)
+  - [ai tts donations](https://github.com/mmattDonk/AI-TTS-Donations)
