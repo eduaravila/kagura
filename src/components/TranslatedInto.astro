@@ -9,7 +9,7 @@ interface Props{
 const { locales,slug } = Astro.props;
 ---
 {locales?.length > 0 &&
-<div class="translations w-full border-white border-2 p-3 rounded break-keep my-4">
+<div class="translations w-full border-2 p-3 rounded break-keep my-4 border-black dark:border-white">
   <p>
     Translated into:
       {
