@@ -54,6 +54,7 @@ We need to consider whether to set personalized restrictions for each user or ap
 - [Sliding window log](#sliding-window-log)
 - [Sliding window](#sliding-window)
 
+
 # Token bucket
 
 - Each request utilizes one token.
@@ -79,7 +80,6 @@ We need to consider whether to set personalized restrictions for each user or ap
 
 :::
 
-----
 
 # Leaky bucket
 
@@ -141,9 +141,9 @@ At regular intervals, requests are pulled from the queue and processed.
 
 ![slidingwindowlog](//images.contentful.com/tt922ph7a4na/4cf02DdmAXJQgunYB3MVXR/740921c61b5a1f2c38e0e81fbde32220/slidingwindowlog.png)
 
-:::warning[Cons]
+:::caution[Learnig curve]
 
-the algo can be memory hard because as it requires storing all timestamps, even if a request is rejected.
+The algo can be memory hard because as it requires storing all timestamps, even if a request is rejected.
 
 :::
 
