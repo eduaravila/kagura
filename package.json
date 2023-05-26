@@ -1,7 +1,6 @@
 {
   "name": "kagura",
   "version": "2.0.2",
-  "packageManager": "yarn@3.4.1",
   "scripts": {
     "dev": "astro dev --port 3005 --host",
     "start": "astro dev",
@@ -65,5 +64,8 @@
     "satori-html": "^0.3.2",
     "sharp": "^0.31.3",
     "unist-util-remove": "^3.1.1"
+  },
+  "engines": {
+    "node": "^16.0.0"
   }
 }
