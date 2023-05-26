@@ -8,10 +8,10 @@ import BaseLayout from "./Base.astro";
 
 interface Props {
 	post: CollectionEntry<"post">;
-  locales: string[];
+	locales: string[];
 }
 
-const { post, locales} = Astro.props;
+const { post, locales } = Astro.props;
 const {
 	data: { title, description, ogImage, publishDate },
 	slug,
@@ -41,18 +41,15 @@ const { headings } = await post.render();
 </script>
 
 <BaseLayout meta={{ title, description, articleDate, ogImage: socialImage }}>
-
 	<div class="sm:grid sm:grid-cols-[3fr_1fr] sm:items-start sm:gap-x-10">
 		<article class="break-words">
-
 			<div id="blog-hero">
-        <BlogHero content={post} locales={locales} />
-      </div>
+				<BlogHero content={post} locales={locales} />
+			</div>
 
 			<div
 				class="prose prose-sm prose-cactus mt-12 prose-headings:font-semibold prose-headings:before:absolute prose-headings:before:-ml-4 prose-headings:before:text-accent prose-headings:before:content-['#'] prose-th:before:content-none"
 			>
-
 				<slot />
 			</div>
 		</article>
@@ -73,7 +70,7 @@ const { headings } = await post.render();
 	</div>
 	<button
 		id="to-top-btn"
-		class="z-90 fixed bottom-8 right-4 flex h-10 w-10 translate-y-28 items-center justify-center rounded-full border-2 border-transparent bg-zinc-200 text-3xl opacity-0 transition-all duration-300 hover:border-zinc-400 data-[show=true]:translate-y-0 data-[show=true]:opacity-100 dark:bg-zinc-700 sm:right-8 sm:h-12 sm:w-12"
+		class="fixed bottom-8 right-4 z-10 flex h-10 w-10 translate-y-28 items-center justify-center rounded-full border-2 border-transparent bg-zinc-200 text-3xl opacity-0 transition-all duration-300 hover:border-zinc-400 data-[show=true]:translate-y-0 data-[show=true]:opacity-100 dark:bg-zinc-700 sm:right-8 sm:h-12 sm:w-12"
 		aria-label="Back to Top"
 		data-show="false"
 		><svg
@@ -89,6 +86,6 @@ const { headings } = await post.render();
 			<path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"></path>
 		</svg>
 	</button>
-  <Newsletter />
+	<Newsletter />
 	<Cusdis PAGE_ID={title} PAGE_TITLE={title} PAGE_URL={title} client:load />
 </BaseLayout>
