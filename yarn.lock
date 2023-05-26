@@ -1425,6 +1425,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:^18.0.0":
+  version: 18.16.15
+  resolution: "@types/node@npm:18.16.15"
+  checksum: 65bc0fd036b0abf307c26e99ca0add3248ac26664ace65f2ae6b85a8bf22d6d6cb2448995f3550d72280b017aafee7cafc03e8a594102a4151bf927236411724
+  languageName: node
+  linkType: hard
+
 "@types/normalize-package-data@npm:^2.4.0":
   version: 2.4.1
   resolution: "@types/normalize-package-data@npm:2.4.1"
@@ -2010,6 +2017,18 @@ __metadata:
   bin:
     astring: bin/astring
   checksum: bc0b98087350c4a0c8a510d491d648cf8b299ec904629d5e0f5ae8d2ccc515cd27475327bb9729c7e92f4a4873adcd05cef15379d0f6f7293f1320319f0d24f0
+  languageName: node
+  linkType: hard
+
+"astro-auto-import@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "astro-auto-import@npm:0.3.0"
+  dependencies:
+    "@types/node": ^18.0.0
+    acorn: ^8.8.0
+  peerDependencies:
+    astro: ^2.0.0
+  checksum: 8ea3fb32bb35d4dc02117cf0e32dae9b4b34dbae16e643e41f9d018a68e45307304476c70ee9808fc918f24aa922c86c67d3baf47f63b3c70215a33412ed5dad
   languageName: node
   linkType: hard
 
@@ -5216,6 +5235,7 @@ __metadata:
     "@typescript-eslint/parser": ^5.48.0
     "@uiw/react-codemirror": ^4.19.9
     astro: ^2.0.0
+    astro-auto-import: ^0.3.0
     astro-eslint-parser: ^0.11.0
     autoprefixer: ^10.4.13
     concurrently: ^7.6.0
@@ -5233,6 +5253,7 @@ __metadata:
     prettier-plugin-tailwindcss: ^0.2.2
     react: ^18.0.0
     react-dom: ^18.0.0
+    remark-directive: ^2.0.1
     satori: 0.1.2
     satori-html: ^0.3.2
     sharp: ^0.31.3
@@ -5241,6 +5262,7 @@ __metadata:
     stylelint-config-standard: ^29.0.0
     tailwindcss: ^3.2.6
     typescript: ^4.9.4
+    unist-util-remove: ^3.1.1
   languageName: unknown
   linkType: soft
 
@@ -5509,6 +5531,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mdast-util-directive@npm:^2.0.0":
+  version: 2.2.4
+  resolution: "mdast-util-directive@npm:2.2.4"
+  dependencies:
+    "@types/mdast": ^3.0.0
+    "@types/unist": ^2.0.0
+    mdast-util-from-markdown: ^1.3.0
+    mdast-util-to-markdown: ^1.5.0
+    parse-entities: ^4.0.0
+    stringify-entities: ^4.0.0
+    unist-util-visit-parents: ^5.1.3
+  checksum: d04112761659c912b5d7db8f8c035918da52e79ce8cb598c7c270c6f678db0c22f3dea7894b30dec46852409f926306b84ca95683dd1e28731835eb5cb4fbda4
+  languageName: node
+  linkType: hard
+
 "mdast-util-find-and-replace@npm:^2.0.0":
   version: 2.2.2
   resolution: "mdast-util-find-and-replace@npm:2.2.2"
@@ -5521,7 +5558,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mdast-util-from-markdown@npm:^1.0.0, mdast-util-from-markdown@npm:^1.1.0":
+"mdast-util-from-markdown@npm:^1.0.0, mdast-util-from-markdown@npm:^1.1.0, mdast-util-from-markdown@npm:^1.3.0":
   version: 1.3.0
   resolution: "mdast-util-from-markdown@npm:1.3.0"
   dependencies:
@@ -5707,7 +5744,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mdast-util-to-markdown@npm:^1.0.0, mdast-util-to-markdown@npm:^1.3.0":
+"mdast-util-to-markdown@npm:^1.0.0, mdast-util-to-markdown@npm:^1.3.0, mdast-util-to-markdown@npm:^1.5.0":
   version: 1.5.0
   resolution: "mdast-util-to-markdown@npm:1.5.0"
   dependencies:
@@ -5787,6 +5824,21 @@ __metadata:
     micromark-util-types: ^1.0.1
     uvu: ^0.5.0
   checksum: 4b483c46077f696ed310f6d709bb9547434c218ceb5c1220fde1707175f6f68b44da15ab8668f9c801e1a123210071e3af883a7d1215122c913fd626f122bfc2
+  languageName: node
+  linkType: hard
+
+"micromark-extension-directive@npm:^2.0.0":
+  version: 2.2.0
+  resolution: "micromark-extension-directive@npm:2.2.0"
+  dependencies:
+    micromark-factory-space: ^1.0.0
+    micromark-factory-whitespace: ^1.0.0
+    micromark-util-character: ^1.0.0
+    micromark-util-symbol: ^1.0.0
+    micromark-util-types: ^1.0.0
+    parse-entities: ^4.0.0
+    uvu: ^0.5.0
+  checksum: 1256374a1327c2aecd4b3592de2c62ddf4798441d3a953f8414ecde05da2595a47428d94959b0bdb67605d4e195b95eb0b6e18ece44a50cbdf5a9c2c25d21905
   languageName: node
   linkType: hard
 
@@ -7464,6 +7516,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"remark-directive@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "remark-directive@npm:2.0.1"
+  dependencies:
+    "@types/mdast": ^3.0.0
+    mdast-util-directive: ^2.0.0
+    micromark-extension-directive: ^2.0.0
+    unified: ^10.0.0
+  checksum: 61539926813654011431cc34e3d6c5ba702a6b610a0e8210b4748828809e86614bbb3e2de5fdee59eed24501f95c41665b175b852cc26544079789db10ac6cd7
+  languageName: node
+  linkType: hard
+
 "remark-frontmatter@npm:^4.0.1":
   version: 4.0.1
   resolution: "remark-frontmatter@npm:4.0.1"
@@ -8871,6 +8935,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"unist-util-remove@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "unist-util-remove@npm:3.1.1"
+  dependencies:
+    "@types/unist": ^2.0.0
+    unist-util-is: ^5.0.0
+    unist-util-visit-parents: ^5.0.0
+  checksum: ed7c762941e6a9b6db230e9417697c8eb7d36093240b6f6d4ec265c4237d33e332a96a18307c8fb322a1842e3feb2a7564b032b5535fa0634eb1e075a6e344cb
+  languageName: node
+  linkType: hard
+
 "unist-util-stringify-position@npm:^3.0.0":
   version: 3.0.3
   resolution: "unist-util-stringify-position@npm:3.0.3"
@@ -8889,7 +8964,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"unist-util-visit-parents@npm:^5.0.0, unist-util-visit-parents@npm:^5.1.1":
+"unist-util-visit-parents@npm:^5.0.0, unist-util-visit-parents@npm:^5.1.1, unist-util-visit-parents@npm:^5.1.3":
   version: 5.1.3
   resolution: "unist-util-visit-parents@npm:5.1.3"
   dependencies:

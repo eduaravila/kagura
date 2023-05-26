@@ -19,7 +19,8 @@ const {
 
 <html lang={siteConfig.lang}>
 	<script async defer src={"/cusdis.es.js"}></script>
-  <GoogleAnalytics id={siteConfig.ga} partytown={true} />
+	<link rel="stylesheet" href="/theme.css" />
+	<GoogleAnalytics id={siteConfig.ga} partytown={true} />
 	<BaseHead title={title} description={description} ogImage={ogImage} articleDate={articleDate} />
 	<script define:vars={{ siteConfig }}>
 		const root = document.documentElement;
@@ -52,13 +53,12 @@ const {
 		observer.observe(root, { attributeFilter: ["class"] });
 		// initailse root class attribute
 		root.classList.toggle("dark", isDark);
-
 	</script>
 
 	<body>
 		<SkipLink />
 		<Header />
-		<main id="main" class="flex-1 w-full">
+		<main id="main" class="w-full flex-1">
 			<slot />
 		</main>
 		<Footer />

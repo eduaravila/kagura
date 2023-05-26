@@ -3,8 +3,9 @@ import mdx from "@astrojs/mdx";
 import prefetch from "@astrojs/prefetch";
 import sitemap from "@astrojs/sitemap";
 import tailwind from "@astrojs/tailwind";
+import AutoImport from "astro-auto-import";
 import { defineConfig } from "astro/config";
-
+import { asideAutoImport, astroAsides } from "./integrations/asides";
 // https://astro.build/config
 import react from "@astrojs/react";
 
@@ -21,7 +22,9 @@ export default defineConfig({
 		},
 	},
 	integrations: [
-		mdx({}),
+		AutoImport({
+			imports: [asideAutoImport],
+		}),
 		tailwind({
 			config: {
 				applyBaseStyles: false,
@@ -36,6 +39,8 @@ export default defineConfig({
 		partytown({
 			config: { debug: false },
 		}),
+		astroAsides(),
+		mdx({}),
 	],
 	vite: {
 		optimizeDeps: {

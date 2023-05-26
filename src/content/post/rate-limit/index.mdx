@@ -1,0 +1,203 @@
+---
+title: "Limiting the rates ☕️"
+publishDate: "04 Dec 2021"
+description: "A rate limiter is used to control the rate of traffic send by a client or a service.."
+tags: ["rate limit", "rate limiter", "rate limiting", "rate limiting algorithm", "rate limiting service", "system design"]
+draft: false
+---
+
+> A rate limiter is used to control the rate of traffic send by a client or a service.
+> rate limit refers to preventing the frequency of an operation from exceeding some constraint.
+
+### Introduction
+
+I've gathered some insightful concepts from the book "System Design Interview,"
+along with valuable resources on rate-limiting strategies and techniques.
+
+These include "Rate-limiting strategies and techniques" from Google Cloud Architecture,
+an engaging article called "An alternative approach to rate limiting" on Figma's blog,
+and an informative guide on rate limits titled "Rate limits: Standard v1.1 Twitter."
+
+These materials offer fresh perspectives and practical advice for optimizing system performance
+while ensuring fair usage. Dive into these captivating resources to discover effective ways to tackle
+rate-limiting challenges in your designs.
+
+### Reasons
+
+- to put in place a defensive measure for services (this is quite essential for large companies)
+- protect services from excessive use
+- put in place a "fair use policy"
+- Prevent resource starvation
+- reduce cost
+
+### Requirements
+
+- accurate limit excessive request
+- low latency, the limiter should not slow down the service
+- use little memory
+- distributed
+- exception handling
+- high fault tolerance
+
+
+:::note[global / per user]
+When it comes to rate limiting, we should decide whether to implement it on a per-user basis or use a global limit. This choice has significant implications for our system's approach to handling rate limits.
+
+We need to consider whether to set personalized restrictions for each user or apply a uniform limit for everyone. It's a crucial decision that affects user experience, system management, and preventing abuse. Striking the right balance between these options is key to an effective rate limiting strategy.
+:::
+
+## Throttling algorithms
+
+- [Token bucket](#token-bucket)
+- [Leaky bucket](#leaky-bucket)
+- [Fixed window API throttling algorithm](#fixed-window-counter)
+- [Sliding window log](#sliding-window-log)
+- [Sliding window](#sliding-window)
+
+### Token bucket
+
+- Each request utilizes one token.
+- Tokens are replenished at regular intervals of time (every n amount).
+- In case there are no tokens available:
+  - The request can be stored for later handling.
+  - Alternatively, the request can be dropped.
+
+![tokenbucket](//images.contentful.com/tt922ph7a4na/53vGhLzF7Q7rKXNOXO8WXJ/801d3dd22c25dbe251a38bc676ba40b7/tokenbucket.png)
+
+### Variables (Token bucket)
+
+- Bucket size
+- Refill rate
+
+:::note[number of buckets]
+
+- It is common to have a separate bucket for different API endpoints.
+
+- When there is a need to throttle requests based on IP address, creating a bucket for each IP is a recommended approach.
+
+- Additionally, it can be beneficial to create a global bucket to handle the maximum number of requests that the server can process per second.
+
+:::
+
+----
+
+# Leaky bucket
+
+This algorithm utilizes a queue (FIFO) to manage requests. If the bucket is already at its maximum capacity, any new requests will be ignored.
+
+The process involves adding new requests to the queue (bucket). If the queue is full, there are two options: the request can either be dropped or saved for later processing.
+
+At regular intervals, requests are pulled from the queue and processed.
+
+![leakingbucket](//images.contentful.com/tt922ph7a4na/59aizudyYbhxuyH28Tz9J7/04f480556a9d30c4e32ed7d514106a0d/leakingbucket.png)
+
+### Pros (Leaky bucket)
+
+- Memory efficient, limited queue size
+- Request are processed at a fixed rate
+
+### Cons (Leaky bucket)
+
+- In the event of a burst of traffic, new requests can merge with older requests if the latter have not been processed in a timely manner.
+
+### Variables (Leaky bucket)
+
+- The bucket size refers to the maximum capacity of the bucket, indicating the number of requests it can hold at any given time.
+- The overflow rate determines the number of requests that can be processed within a fixed rate or time interval. It represents the rate at which the bucket can handle incoming requests without overflowing.
+
+---
+
+## Fixed window counter
+
+- The algorithm partitions the timeline into time windows of fixed size.
+- For each request, the counter corresponding to each window is incremented.
+
+![fixedwindow1](//images.contentful.com/tt922ph7a4na/67huMd840Piek93zKvi6Qn/cf19f8225a9b3b3bd4b6c46ff69f7479/fixedwindow2.png)
+
+- Time edges can be a challenge.
+- This can result in the possibility of having twice as many allowed requests.
+
+![fixedwindow2](//images.contentful.com/tt922ph7a4na/5W0yf0HpKU9iZifpOBXS8V/dde3617f9be51f732963748045646cbd/fixedwindow1.png)
+
+### Pros (fixed window)
+
+- Memory efficient
+- Fixed counter per n amount of time can fit some use cases
+- Easy to understand
+
+### Variables (fixed window)
+
+- Counter per window
+- Window time
+
+---
+
+# Sliding window log
+
+- keep track of the timestamps (request)
+- when a new request comes in remove all outdated timestamps, those are defined to be older than the current time window
+- add timestamp of the new request to the log
+- if the log size is bigger than the max allowed drop / save else handle normally
+
+![slidingwindowlog](//images.contentful.com/tt922ph7a4na/4cf02DdmAXJQgunYB3MVXR/740921c61b5a1f2c38e0e81fbde32220/slidingwindowlog.png)
+
+:::warning[Cons]
+
+the algo can be memory hard because as it requires storing all timestamps, even if a request is rejected.
+
+:::
+
+### Pros (sliding window log)
+
+- The algorithm is very accurate
+
+### Cons (sliding window log)
+
+- Memory hard
+
+### Variables (sliding window log)
+
+- Request per minute
+
+
+# Sliding window
+
+Similar to the fixed window approach, this algorithm employs a timer and a counter to manage the maximum number of available requests per user. However, in this case, the timer begins counting only after the first request is made.
+
+This algorithm combines the benefits of both the bucket and fixed window approaches. Unlike the previous methods, the sliding window implementation ensures that newer requests are not starved, and the system is not overwhelmed by bursts of requests.
+
+![slidingwindow](//images.contentful.com/tt922ph7a4na/70GOCj2vvqKRbCPPpcuK6y/d72fe3f0ed4b2bb9b44b4c7b732415b9/slidingwindow.png)
+
+:::tip[ end of the minute means 100%]
+
+One way to visualize this is to consider that at the end of the current window, the allowed percentage of requests would be 100%, while at the start of that window, it would be 0%.
+
+:::
+
+### Pros (sliding window)
+
+- Smooths out spikes by basing the current rate on the average rate of the previous window.
+
+- It is memory efficient.
+
+### Variables (sliding window)
+
+- Request per minute
+- Prev minute
+- Prev percentage
+- Current minute
+- Current time
+- Current percentage
+
+
+
+### References
+
+[system design interview](https://www.amazon.com.mx/System-Design-Interview-Insiders-English-ebook/dp/B08B3FWYBX/ref=sr_1_1?__mk_es_MX=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=3C6XU45E9L8UO&keywords=system+design+interview&qid=1638250638&sprefix=system+desi%2Caps%2C173&sr=8-1)
+[Rate-limiting strategies and techniques](https://cloud.google.com/architecture/rate-limiting-strategies-techniques#rate-limiting_features_in_gcp), [An alternative approach to rate limiting
+](https://www.figma.com/blog/an-alternative-approach-to-rate-limiting/?utm_source=pocket_mylist) & [Rate limits: Standard v1.1
+twitter](https://developer.twitter.com/en/docs/twitter-api/v1/rate-limits?utm_source=pocket_mylist)
+
+
+
+
