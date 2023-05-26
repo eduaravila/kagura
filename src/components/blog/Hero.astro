@@ -5,19 +5,17 @@ import TranslatedInto from "../TranslatedInto.astro";
 
 interface Props {
 	content: CollectionEntry<"post">;
-  locales: string[];
-
+	locales: string[];
 }
 
 const { content, locales } = Astro.props;
-const {post } = Astro.params
+const { post } = Astro.params;
 const datetime = content.data.publishDate.toISOString();
 const postDate = getFormattedDate(content.data.publishDate);
 ---
 
 <h1 class="title">{content.data.title}</h1>
 <time datetime={datetime}>{postDate}</time>
-
 
 {
 	!!content.data.tags?.length && (
@@ -56,4 +54,3 @@ const postDate = getFormattedDate(content.data.publishDate);
 }
 
 <TranslatedInto slug={post} locales={locales} />
-<p class="mt-8">{content.data.description}</p>
